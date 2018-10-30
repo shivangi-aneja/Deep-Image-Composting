@@ -1,0 +1,9 @@
+.idea/*
+.ipynb_checkpoints/*
+*.pyc
+!.gitkeep
+data/*
+logs/*
+tf_logs/*
+venv/*
+test.py

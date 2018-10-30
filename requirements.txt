@@ -1,0 +1,5 @@
+numpy==1.15.3
+scipy==0.19.0
+matplotlib==2.0.0
+scikit-image
+tensorflow-gpu==1.6

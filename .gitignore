@@ -3,7 +3,7 @@
 *.pyc
 !.gitkeep
 data/*
+data_orig/*
 logs/*
 tf_logs/*
 venv/*
-test.py

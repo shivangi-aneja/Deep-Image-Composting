@@ -3,6 +3,7 @@
 """
 import os
 import torch
+import numpy as np
 from torchvision import datasets, transforms
 from torch.utils.data.dataset import (Subset)
 
@@ -71,6 +72,40 @@ class MNIST(BaseDataset):
 
     def n_classes(self):
         return 10
+
+class POLYPS(BaseDataset):
+    """
+    POLYPS dataset
+    """
+    def __init__(self):
+        super(BaseDataset, self).__init__()
+
+    def _load(self, dirpath):
+        # Training images
+        train_img = np.load(dirpath + '/train_X.npy')
+        train_val_y = np.load(dirpath + '/train_Y.npy')
+
+        train_x = torch.stack([torch.Tensor(i) for i in train_val_x[0:800]])
+        val_x = torch.stack([torch.Tensor(i) for i in train_val_x[800:]])
+
+        train_y = torch.stack([torch.Tensor(i) for i in train_val_y[0:800]])
+        val_y = torch.stack([torch.Tensor(i) for i in train_val_y[800:]])
+
+        test_x = torch.stack([torch.Tensor(i) for i in np.load(dirpath + '/test_X.npy')])
+        test_y = torch.stack([torch.Tensor(i) for i in np.load(dirpath + '/test_Y.npy')])
+
+        train = SegDataset(train_x, train_y)
+        val = SegDataset(val_x, val_y)
+        test = SegDataset(test_x,test_y)
+
+        return train, val, test
+
+    def n_classes(self):
+        # In segmentation n_classes = 2 (One foreground, other background)
+        return 2
+
+
+DATASETS = {"polyps"}
 
 
 DATASETS = {"mnist"}

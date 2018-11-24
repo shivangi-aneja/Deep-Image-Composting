@@ -107,7 +107,7 @@ def main(args=args):
     # load and shuffle data
     dataset = make_dataset(args.dataset)
 
-    train_dataset, val_dataset, test_dataset = dataset.load(args.data_dirpath)
+    train_dataset, val_dataset = dataset.load(args.data_dirpath)
 
     rng = RNG(args.random_seed)
     train_ind = rng.permutation(len(train_dataset))

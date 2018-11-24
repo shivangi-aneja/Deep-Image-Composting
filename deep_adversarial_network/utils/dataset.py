@@ -26,6 +26,8 @@ def make_dataset(name):
         raise ValueError("invalid dataset: '{0}'".format(name))
     elif name == 'mnist':
         return MNIST()
+    elif name == 'toy':
+        return  TOY_DATA()
 
 
 class BaseDataset(object):
@@ -73,42 +75,28 @@ class MNIST(BaseDataset):
     def n_classes(self):
         return 10
 
-class POLYPS(BaseDataset):
+class TOY_DATA(BaseDataset):
     """
-    POLYPS dataset
+    TOY_DATA dataset
     """
     def __init__(self):
         super(BaseDataset, self).__init__()
 
     def _load(self, dirpath):
         # Training images
-        train_img = np.load(dirpath + '/train_X.npy')
-        train_val_y = np.load(dirpath + '/train_Y.npy')
+        image_tuple = np.load(dirpath + '/composite.npy')
 
-        train_x = torch.stack([torch.Tensor(i) for i in train_val_x[0:800]])
-        val_x = torch.stack([torch.Tensor(i) for i in train_val_x[800:]])
+        train_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:5]])
+        val_data = torch.stack([torch.Tensor(i) for i in image_tuple[5:]])
 
-        train_y = torch.stack([torch.Tensor(i) for i in train_val_y[0:800]])
-        val_y = torch.stack([torch.Tensor(i) for i in train_val_y[800:]])
-
-        test_x = torch.stack([torch.Tensor(i) for i in np.load(dirpath + '/test_X.npy')])
-        test_y = torch.stack([torch.Tensor(i) for i in np.load(dirpath + '/test_Y.npy')])
-
-        train = SegDataset(train_x, train_y)
-        val = SegDataset(val_x, val_y)
-        test = SegDataset(test_x,test_y)
-
-        return train, val, test
+        return train_data, val_data
 
     def n_classes(self):
         # In segmentation n_classes = 2 (One foreground, other background)
         return 2
 
 
-DATASETS = {"polyps"}
-
-
-DATASETS = {"mnist"}
+DATASETS = {"mnist", "toy"}
 
 
 

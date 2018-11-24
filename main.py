@@ -35,7 +35,7 @@ IMAGE_PIXELS = 28*28
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # general
-parser.add_argument('-d', '--dataset', type=str, default='mnist',
+parser.add_argument('-d', '--dataset', type=str, default='toy',
                     help="dataset, {'" +\
                          "', '".join(get_available_datasets()) +\
                          "'}")
@@ -112,11 +112,9 @@ def main(args=args):
     rng = RNG(args.random_seed)
     train_ind = rng.permutation(len(train_dataset))
     val_ind = rng.permutation(len(val_dataset))
-    test_ind = rng.permutation(len(test_dataset))
 
     train_dataset = DatasetIndexer(train_dataset, train_ind)
     val_dataset = DatasetIndexer(val_dataset, val_ind)
-    test_dataset = DatasetIndexer(test_dataset, test_ind)
 
     batch_size = args.batch_size
 
@@ -128,10 +126,6 @@ def main(args=args):
                             batch_size=batch_size,
                             shuffle=True,
                             num_workers=args.n_workers)
-    test_loader = DataLoader(dataset=test_dataset,
-                             batch_size=batch_size,
-                             shuffle=True,
-                             num_workers=args.n_workers)
 
     print("Main function")
     tf_log_path = os.path.join(os.getcwd(), args.tf_logs+'/')

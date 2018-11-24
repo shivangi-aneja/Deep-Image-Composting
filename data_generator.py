@@ -82,34 +82,40 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
     for fg_img in sorted(os.listdir(fg_img_path)):
         for bg_img in sorted(os.listdir(bg_path)):
 
-            # Load image, mask and background
-            foreground = cv2.imread(fg_img_path+fg_img)
-            alpha = cv2.imread(fg_mask_path+fg_img)
-            background = cv2.imread(bg_path+bg_img)
+            if fg_img.endswith(".png") and bg_img.endswith(".png"):
+                # Load image, mask and background
+                foreground = cv2.imread(fg_img_path+fg_img)
+                alpha = cv2.imread(fg_mask_path+fg_img)
+                background = cv2.imread(bg_path+bg_img)
 
-            # Convert uint8 to float
-            fg = foreground.astype(float)
-            bg = background.astype(float)
+                # Convert uint8 to float
+                fg = foreground.astype(float)
+                bg = background.astype(float)
 
-            # Normalize the alpha mask to keep intensity between 0 and 1
-            alpha = alpha.astype(float) / 255
+                # Normalize the alpha mask to keep intensity between 0 and 1
+                alpha = alpha.astype(float) / 255
 
-            # Multiply the foreground with the alpha matte
-            foreground = cv2.multiply(alpha, fg)
+                # Multiply the foreground with the alpha matte
+                foreground = cv2.multiply(alpha, fg)
 
-            # Multiply the background with ( 1 - alpha )
-            background = cv2.multiply(1.0 - alpha, bg)
+                # Multiply the background with ( 1 - alpha )
+                background = cv2.multiply(1.0 - alpha, bg)
 
-            # Add the masked foreground and background.
-            out_image = cv2.add(foreground, background)
+                # Add the masked foreground and background.
+                out_image = cv2.add(foreground, background)
 
-            # Display image
-            cv2.imwrite(comp_img_path+str(ctr)+'.png', out_image)
-            cv2.imwrite(comp_img_path+str(ctr)+'_fg.png', fg)
-            cv2.imwrite(comp_img_path+str(ctr)+'_bg.png', bg)
-            cv2.imwrite(comp_img_path+str(ctr)+'_mask.png', alpha*255)
-            composite_img_tuple.append((out_image, fg, alpha*255, bg))
-            ctr += 1
+                # Display image
+                cv2.imwrite(comp_img_path+str(ctr)+'.png', out_image)
+                #cv2.imwrite(comp_img_path+str(ctr)+'_fg.png', fg)
+                #cv2.imwrite(comp_img_path+str(ctr)+'_bg.png', bg)
+                #cv2.imwrite(comp_img_path+str(ctr)+'_mask.png', alpha*255)
+                composite_img_tuple.append((out_image, fg, alpha*255, bg))
+                ctr += 1
+                print(ctr)
+            if ctr == 500:
+                break
+        if ctr == 500:
+            break
 
     name_mask = 'composite.npy'
     np.save(os.path.join(comp_file_path + name_mask), composite_img_tuple)
@@ -122,11 +128,11 @@ def main():
 
 
 
-    input_dir1 = os.path.join(os.getcwd(), 'data/background/')
-    input_dir2 = os.path.join(os.getcwd(), 'data/foreground/gt/')
-    input_dir3 = os.path.join(os.getcwd(), 'data/foreground/img/')
-    input_dir4 = os.path.join(os.getcwd(), 'data/composite/')
-    path = os.path.join(os.getcwd(), 'data/')
+    input_dir1 = os.path.join(os.getcwd(), 'data/toy_data/background/')
+    input_dir2 = os.path.join(os.getcwd(), 'data/toy_data/foreground/gt/')
+    input_dir3 = os.path.join(os.getcwd(), 'data/toy_data/foreground/img/')
+    input_dir4 = os.path.join(os.getcwd(), 'data/toy_data/composite/')
+    path = os.path.join(os.getcwd(), 'data/toy_data/')
 
     # For renaming
     # change_img_to_png(input_dir1)

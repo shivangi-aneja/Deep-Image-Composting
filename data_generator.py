@@ -14,23 +14,26 @@ def change_img_to_png(input_path):
             os.rename(input_path + "/" + image, input_path + "/" + image.split(".")[0] + '.png')
 
 
-# Resize images to be of size 400*256
+# Resize images to be of size 32*32
 def resize_images(input_path):
 
-    new_size = (400,256)
+    new_size = (32,32)
     for image in sorted(os.listdir(input_path)):
         if image.endswith(".png"):
             img = cv2.imread(input_path+image)
-            new_image = cv2.resize(img, new_size)
+            new_image = cv2.resize(img, new_size, interpolation = cv2.INTER_AREA)
             new_image = cv2.cvtColor(new_image, cv2.IMREAD_COLOR)
-            cv2.waitKey(0)
+            #cv2.waitKey(0)
             cv2.imwrite(input_path+image.split(".")[0]+'.png',new_image)
+            # im = Image.open(input_path+image)
+            # im.thumbnail(new_size)
+            # im.save(input_path+image.split(".")[0]+".png")
 
 def save_to_numpy_array(fg_img_path,fg_mask_path,bg_path,path):
 
     fg_list = []
     mask_list = []
-    bg_list =   []
+    bg_list =  []
 
     # For Foreground images
     for image in sorted(os.listdir(fg_img_path)):
@@ -70,7 +73,7 @@ def save_to_numpy_array(fg_img_path,fg_mask_path,bg_path,path):
             # This data has shape (height, width)
             data = np.array(image, dtype='uint8')
             mask_list.append(data)
-    name_mask =  'fg_mask.npy'
+    name_mask = 'fg_mask.npy'
     np.save(os.path.join(path + name_mask), mask_list)
 
 
@@ -82,40 +85,45 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
     for fg_img in sorted(os.listdir(fg_img_path)):
         for bg_img in sorted(os.listdir(bg_path)):
 
-            if fg_img.endswith(".png") and bg_img.endswith(".png"):
-                # Load image, mask and background
-                foreground = cv2.imread(fg_img_path+fg_img)
-                alpha = cv2.imread(fg_mask_path+fg_img)
-                background = cv2.imread(bg_path+bg_img)
+            try:
+                if fg_img.endswith(".png") and fg_img is not None and bg_img.endswith(".png") and bg_img is not None:
+                    # Load image, mask and background
+                    foreground = cv2.imread(fg_img_path+fg_img)
+                    alpha = cv2.imread(fg_mask_path+fg_img)
+                    background = cv2.imread(bg_path+bg_img)
 
-                # Convert uint8 to float
-                fg = foreground.astype(float)
-                bg = background.astype(float)
+                    # Convert uint8 to float
+                    fg = foreground.astype(float)
+                    bg = background.astype(float)
 
-                # Normalize the alpha mask to keep intensity between 0 and 1
-                alpha = alpha.astype(float) / 255
+                    # Normalize the alpha mask to keep intensity between 0 and 1
+                    alpha = alpha.astype(float) / 255
 
-                # Multiply the foreground with the alpha matte
-                foreground = cv2.multiply(alpha, fg)
+                    # Multiply the foreground with the alpha matte
+                    foreground = cv2.multiply(alpha, fg)
 
-                # Multiply the background with ( 1 - alpha )
-                background = cv2.multiply(1.0 - alpha, bg)
+                    # Multiply the background with ( 1 - alpha )
+                    background = cv2.multiply(1.0 - alpha, bg)
 
-                # Add the masked foreground and background.
-                out_image = cv2.add(foreground, background)
+                    # Add the masked foreground and background.
+                    out_image = cv2.add(foreground, background)
 
-                # Display image
-                cv2.imwrite(comp_img_path+str(ctr)+'.png', out_image)
-                #cv2.imwrite(comp_img_path+str(ctr)+'_fg.png', fg)
-                #cv2.imwrite(comp_img_path+str(ctr)+'_bg.png', bg)
-                #cv2.imwrite(comp_img_path+str(ctr)+'_mask.png', alpha*255)
-                composite_img_tuple.append((out_image, fg, alpha*255, bg))
-                ctr += 1
-                print(ctr)
-            if ctr == 500:
-                break
-        if ctr == 500:
-            break
+                    # Display image
+                    cv2.imwrite(comp_img_path+str(ctr)+'.png', out_image)
+                    cv2.imwrite(comp_img_path+str(ctr)+'_fg.png', fg)
+                    cv2.imwrite(comp_img_path+str(ctr)+'_bg.png', bg)
+                    cv2.imwrite(comp_img_path+str(ctr)+'_mask.png', alpha*255)
+                    composite_img_tuple.append((out_image, fg, alpha*255, bg))
+                    ctr += 1
+                    print(ctr)
+            except:
+                print(fg_img_path+fg_img)
+                print(fg_mask_path+fg_img)
+                print(bg_path+bg_img)
+        #     if ctr == 5000:
+        #         break
+        # if ctr == 500:
+        #     break
 
     name_mask = 'composite.npy'
     np.save(os.path.join(comp_file_path + name_mask), composite_img_tuple)
@@ -125,8 +133,6 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
 
 
 def main():
-
-
 
     input_dir1 = os.path.join(os.getcwd(), 'data/toy_data/background/')
     input_dir2 = os.path.join(os.getcwd(), 'data/toy_data/foreground/gt/')
@@ -138,8 +144,8 @@ def main():
     # change_img_to_png(input_dir1)
     # change_img_to_png(input_dir2)
     # change_img_to_png(input_dir3)
-
-    # For resizing
+    #
+    # # For resizing
     # resize_images(input_path = input_dir1)
     # resize_images(input_path = input_dir2)
     # resize_images(input_path = input_dir3)

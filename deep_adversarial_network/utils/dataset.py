@@ -5,6 +5,7 @@ import os
 import torch
 import numpy as np
 from torchvision import datasets, transforms
+from deep_adversarial_network.utils.custom_dataloader import CustomDataset
 from torch.utils.data.dataset import (Subset)
 
 def get_available_datasets():
@@ -86,10 +87,14 @@ class TOY_DATA(BaseDataset):
         # Training images
         image_tuple = np.load(dirpath + '/composite.npy')
 
-        train_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:5]])
-        val_data = torch.stack([torch.Tensor(i) for i in image_tuple[5:]])
+        train_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:10]])
+        val_data = torch.stack([torch.Tensor(i) for i in image_tuple[10:20]])
 
-        return train_data, val_data
+        train = CustomDataset(comp_image=train_data[:,0,:,:], fg_img=train_data[:,1,:,:],
+                              alpha=train_data[:,2,:,:], bg_img=train_data[:,3,:,:])
+        val = CustomDataset(comp_image=val_data[:, 0, :, :], fg_img=val_data[:, 1, :, :],
+                              alpha=val_data[:, 2, :, :], bg_img=val_data[:, 3, :, :])
+        return train, val
 
     def n_classes(self):
         # In segmentation n_classes = 2 (One foreground, other background)

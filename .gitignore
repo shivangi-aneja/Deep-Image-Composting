@@ -7,3 +7,4 @@ data_orig/*
 logs/*
 tf_logs/*
 venv/*
+models/*

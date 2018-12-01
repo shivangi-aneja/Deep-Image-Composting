@@ -2,9 +2,9 @@
  init class for all the discrimina for all the datasets
 """
 
-from deep_adversarial_network.discriminator.mnist_discriminator import *
+from deep_adversarial_network.discriminator.test_discriminator import *
 
-DISCRIMINATORS = {"mnist_discriminator1"}
+DISCRIMINATORS = {"test_discriminator1"}
 
 def get_available_discriminators():
     """
@@ -23,7 +23,7 @@ def make_discriminator(name, *args, **kwargs):
     """
     name = name.strip().lower()
     if not name in DISCRIMINATORS:
-        raise ValueError("invalid autoencoder architecture: '{0}'".format(name))
+        raise ValueError("invalid discriminator architecture: '{0}'".format(name))
 
-    elif name == "mnist_discriminator1":
-        return MNIST_Discriminator1(*args, **kwargs)
+    elif name == "test_discriminator1":
+        return test_Discriminator1()

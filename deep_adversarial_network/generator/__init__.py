@@ -2,9 +2,9 @@
  init class for all the discrimina for all the datasets
 """
 
-from deep_adversarial_network.generator.mnist_generator import *
+from deep_adversarial_network.generator.test_generator import *
 
-GENERATORS = {"mnist_generator1"}
+GENERATORS = {"test_generator1"}
 
 def get_available_generators():
     """
@@ -25,5 +25,5 @@ def make_generator(name, *args, **kwargs):
     if not name in GENERATORS:
         raise ValueError("invalid autoencoder architecture: '{0}'".format(name))
 
-    elif name == "mnist_generator1":
-        return MNIST_Generator1(*args, **kwargs)
+    elif name == "test_generator1":
+        return test_Generator1()

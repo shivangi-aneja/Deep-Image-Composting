@@ -6,7 +6,6 @@
 
 import os
 import argparse
-import pprint
 import tensorflow as tf
 from torch.utils.data import DataLoader
 from deep_adversarial_network.logging.logger import rootLogger
@@ -27,9 +26,9 @@ OPTIMIZERS = {
 
 LOG_PATH = os.path.join(os.getcwd(), 'logs/')
 PLOT_PATH = os.path.join(os.getcwd(), 'plots/')
+MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 
-NOISE_SIZE = 100
-IMAGE_PIXELS = 28*28
+
 
 # training settings
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -51,16 +50,13 @@ parser.add_argument('--gpu', type=str, default='0',
 parser.add_argument('-rs', '--random-seed', type=int, default=1,
                     help="random seed for training")
 
-parser.add_argument('-tf', '--tf_logs', type=str, default='tf_logs',
-                    help="log folder for tensorflow logging")
-
 # GAN-related
-parser.add_argument('-dr', '--discriminator', type=str, default='mnist_discriminator1',
+parser.add_argument('-dr', '--discriminator', type=str, default='test_discriminator1',
                     help="discriminator architecture name, {'" + \
                          "', '".join(get_available_discriminators()) +\
                          "'}")
 
-parser.add_argument('-gr', '--generator', type=str, default='mnist_generator1',
+parser.add_argument('-gr', '--generator', type=str, default='test_generator1',
                     help="generator architecture name, {'" + \
                          "', '".join(get_available_generators()) +\
                          "'}")
@@ -68,7 +64,7 @@ parser.add_argument('-gr', '--generator', type=str, default='mnist_generator1',
 parser.add_argument('-lr', '--learning-rate', type=float, default=1e-4,
                     help='initial learning rate')
 
-parser.add_argument('-b', '--batch_size', type=int, default=256,
+parser.add_argument('-b', '--batch_size', type=int, default=2,
                     help='input batch size for training')
 
 parser.add_argument('-opt', '--optim', type=str, default='adam',
@@ -81,7 +77,12 @@ parser.add_argument('-m', '--model_name', type=str,
 parser.add_argument('-e', '--epochs', type=int, default=5,
                     help='number of epochs')
 
+# Plot related
+parser.add_argument('-tf', '--tf_logs', type=str, default='tf_logs',
+                    help="log folder for tensorflow logging")
 
+parser.add_argument('-mp', '--plot_matplotlib', type=str, default='y',
+                    help="whether to plot matplotlib plots")
 
 
 # parse and validate parameters
@@ -95,7 +96,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 
 # print arguments
 rootLogger.info("Running with the following parameters:")
-pprint.pprint(vars(args))
+rootLogger.info(vars(args))
 
 def main(args=args):
     """
@@ -106,7 +107,6 @@ def main(args=args):
 
     # load and shuffle data
     dataset = make_dataset(args.dataset)
-
     train_dataset, val_dataset = dataset.load(args.data_dirpath)
 
     rng = RNG(args.random_seed)
@@ -117,6 +117,7 @@ def main(args=args):
     val_dataset = DatasetIndexer(val_dataset, val_ind)
 
     batch_size = args.batch_size
+    mplib = True if args.plot_matplotlib=='y' else False
 
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,
@@ -127,18 +128,13 @@ def main(args=args):
                             shuffle=True,
                             num_workers=args.n_workers)
 
-    print("Main function")
     tf_log_path = os.path.join(os.getcwd(), args.tf_logs+'/')
-    # Input
-    X = tf.placeholder(tf.float32, shape=(None, IMAGE_PIXELS))
-    # Input
-    Z = tf.placeholder(tf.float32, shape=(None, NOISE_SIZE))
 
     # build discriminator model
-    discriminator = make_discriminator(name=args.discriminator, x=X)
+    discriminator = make_discriminator(name=args.discriminator)
 
     # build generator model
-    generator = make_generator(name=args.generator, z=Z)
+    generator = make_generator(name=args.generator)
 
     # get optimizer
     optim = OPTIMIZERS.get(args.optim, None)
@@ -147,10 +143,11 @@ def main(args=args):
 
 
     # Create GAN according to params
-    model = DeepGAN(discriminator=discriminator, generator=generator, noise_size=NOISE_SIZE, model_name=args.model_name,
-                    dataset=args.dataset, batch_size=args.batch_size, optim=optim, lr=args.learning_rate, epochs=args.epochs)
+    model = DeepGAN(discriminator=discriminator, generator=generator, model_name=args.model_name,
+                    dataset=args.dataset, batch_size=args.batch_size, optim=optim, lr=args.learning_rate,
+                    epochs=args.epochs, mplib=mplib, tf_log_path=tf_log_path)
     # Train the model
-    model.adversarial_train(X=X, Z=Z, data_loader=train_loader, tf_log_path=tf_log_path)
+    model.adversarial_train(data_loader=train_loader,test_loader=val_loader, model_path=MODEL_PATH)
 
 
 if __name__ == '__main__':

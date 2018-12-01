@@ -14,10 +14,10 @@ def change_img_to_png(input_path):
             os.rename(input_path + "/" + image, input_path + "/" + image.split(".")[0] + '.png')
 
 
-# Resize images to be of size 32*32
+# Resize images to be of size 400*350
 def resize_images(input_path):
 
-    new_size = (32,32)
+    new_size = (400,400)
     for image in sorted(os.listdir(input_path)):
         if image.endswith(".png"):
             img = cv2.imread(input_path+image)
@@ -134,11 +134,11 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
 
 def main():
 
-    input_dir1 = os.path.join(os.getcwd(), 'data/toy_data/background/')
-    input_dir2 = os.path.join(os.getcwd(), 'data/toy_data/foreground/gt/')
-    input_dir3 = os.path.join(os.getcwd(), 'data/toy_data/foreground/img/')
-    input_dir4 = os.path.join(os.getcwd(), 'data/toy_data/composite/')
-    path = os.path.join(os.getcwd(), 'data/toy_data/')
+    input_dir1 = os.path.join(os.getcwd(), 'data_orig/toy_data/background/')
+    input_dir2 = os.path.join(os.getcwd(), 'data_orig/toy_data/foreground/gt/')
+    input_dir3 = os.path.join(os.getcwd(), 'data_orig/toy_data/foreground/img/')
+    input_dir4 = os.path.join(os.getcwd(), 'data_orig/toy_data/composite/')
+    path = os.path.join(os.getcwd(), 'data_orig/toy_data/')
 
     # For renaming
     # change_img_to_png(input_dir1)
@@ -146,9 +146,9 @@ def main():
     # change_img_to_png(input_dir3)
     #
     # # For resizing
-    # resize_images(input_path = input_dir1)
-    # resize_images(input_path = input_dir2)
-    # resize_images(input_path = input_dir3)
+    resize_images(input_path = input_dir1)
+    resize_images(input_path = input_dir2)
+    resize_images(input_path = input_dir3)
 
     # Save to numpy
     #save_to_numpy_array(fg_img_path=input_dir3, fg_mask_path=input_dir2, bg_path=input_dir1, path=path)

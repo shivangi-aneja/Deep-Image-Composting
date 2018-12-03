@@ -61,13 +61,21 @@ parser.add_argument('-gr', '--generator', type=str, default='test_generator1',
                          "', '".join(get_available_generators()) +\
                          "'}")
 
-parser.add_argument('-lr', '--learning-rate', type=float, default=1e-4,
-                    help='initial learning rate')
+parser.add_argument('-d_lr', '--d_lr', type=float, default=1e-4,
+                    help='discriminator learning rate')
+
+parser.add_argument('-g_lr', '--g_lr', type=float, default=1e-4,
+                    help='generator learning rate')
 
 parser.add_argument('-b', '--batch_size', type=int, default=2,
                     help='input batch size for training')
 
-parser.add_argument('-opt', '--optim', type=str, default='adam',
+parser.add_argument('-d_opt', '--d_optim', type=str, default='adam',
+                    help="optimizer, {'" + \
+                         "', '".join(OPTIMIZERS.keys()) +\
+                         "'}")
+
+parser.add_argument('-g_opt', '--g_optim', type=str, default='adam',
                     help="optimizer, {'" + \
                          "', '".join(OPTIMIZERS.keys()) +\
                          "'}")
@@ -137,14 +145,21 @@ def main(args=args):
     generator = make_generator(name=args.generator)
 
     # get optimizer
-    optim = OPTIMIZERS.get(args.optim, None)
-    if not optim:
-        raise ValueError("invalid optimizer: '{0}'".format(args.optim))
+    d_optim = OPTIMIZERS.get(args.d_optim, None)
+    if not d_optim:
+        raise ValueError("invalid optimizer: '{0}'".format(args.d_optim))
 
+    g_optim = OPTIMIZERS.get(args.g_optim, None)
+    if not g_optim:
+        raise ValueError("invalid optimizer: '{0}'".format(args.g_optim))
+
+    # get learning rate
+    d_lr = args.d_lr
+    g_lr = args.g_lr
 
     # Create GAN according to params
     model = DeepGAN(discriminator=discriminator, generator=generator, model_name=args.model_name,
-                    dataset=args.dataset, batch_size=args.batch_size, optim=optim, lr=args.learning_rate,
+                    dataset=args.dataset, batch_size=args.batch_size, d_optim=d_optim, g_optim=g_optim, d_lr=d_lr, g_lr=g_lr,
                     epochs=args.epochs, mplib=mplib, tf_log_path=tf_log_path)
     # Train the model
     model.adversarial_train(data_loader=train_loader,test_loader=val_loader, model_path=MODEL_PATH)

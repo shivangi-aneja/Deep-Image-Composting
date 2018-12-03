@@ -17,7 +17,7 @@ def change_img_to_png(input_path):
 # Resize images to be of size 400*350
 def resize_images(input_path):
 
-    new_size = (400,400)
+    new_size = (32,32)
     for image in sorted(os.listdir(input_path)):
         if image.endswith(".png"):
             img = cv2.imread(input_path+image)
@@ -77,6 +77,28 @@ def save_to_numpy_array(fg_img_path,fg_mask_path,bg_path,path):
     np.save(os.path.join(path + name_mask), mask_list)
 
 
+def save_to_numpy(comp_img_path, gt_img_path, path,file):
+
+    img_list = []
+
+    # For Foreground images
+    for image in sorted(os.listdir(comp_img_path)):
+
+        if image.endswith(".png"):
+            comp_image = Image.open(comp_img_path+image)
+            gt_image = Image.open(gt_img_path+image.split(".")[0]+"_blended.png")
+            # This data has shape (height, width, channels)
+            comp_data = np.array(comp_image, dtype='uint8')
+            gt_data = np.array(gt_image, dtype='uint8')
+            # Change to (channels, height, width)
+            #comp_data = np.transpose(comp_data, [2,0,1])
+            #gt_data = np.transpose(gt_data, [2,0,1])
+            img_list.append((comp_data,gt_data))
+
+    name_img_file = file+'.npy'
+    np.save(os.path.join(path + name_img_file), img_list)
+
+
 def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_file_path):
 
     composite_img_tuple = []
@@ -134,11 +156,12 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
 
 def main():
 
-    input_dir1 = os.path.join(os.getcwd(), 'data_orig/toy_data/background/')
-    input_dir2 = os.path.join(os.getcwd(), 'data_orig/toy_data/foreground/gt/')
-    input_dir3 = os.path.join(os.getcwd(), 'data_orig/toy_data/foreground/img/')
-    input_dir4 = os.path.join(os.getcwd(), 'data_orig/toy_data/composite/')
-    path = os.path.join(os.getcwd(), 'data_orig/toy_data/')
+    input_dir1 = os.path.join(os.getcwd(), 'data/toy_data/background/')
+    input_dir2 = os.path.join(os.getcwd(), 'data/toy_data/foreground/gt/')
+    input_dir3 = os.path.join(os.getcwd(), 'data/toy_data/foreground/img/')
+    input_dir4 = os.path.join(os.getcwd(), 'data/toy_data/composite/')
+    input_dir5 = os.path.join(os.getcwd(), 'data/toy_data/blended/')
+    path = os.path.join(os.getcwd(), 'data/toy_data/')
 
     # For renaming
     # change_img_to_png(input_dir1)
@@ -146,16 +169,19 @@ def main():
     # change_img_to_png(input_dir3)
     #
     # # For resizing
-    resize_images(input_path = input_dir1)
-    resize_images(input_path = input_dir2)
-    resize_images(input_path = input_dir3)
+    # resize_images(input_path = input_dir1)
+    # resize_images(input_path = input_dir2)
+    # resize_images(input_path = input_dir3)
+    #resize_images(input_path = input_dir4)
+    #resize_images(input_path = input_dir5)
 
+    save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='toy_data')
     # Save to numpy
     #save_to_numpy_array(fg_img_path=input_dir3, fg_mask_path=input_dir2, bg_path=input_dir1, path=path)
 
     # Create Composite Images
-    create_composite_img(comp_img_path=input_dir4, fg_img_path=input_dir3, fg_mask_path=input_dir2,
-                         bg_path=input_dir1, comp_file_path=path)
+    # create_composite_img(comp_img_path=input_dir4, fg_img_path=input_dir3, fg_mask_path=input_dir2,
+    #                      bg_path=input_dir1, comp_file_path=path)
 
 
 

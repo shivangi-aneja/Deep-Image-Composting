@@ -40,7 +40,7 @@ class Logger:
         self.writer.add_scalar(
             '{}/G_error'.format(self.comment), g_error, step)
 
-    def log_images(self, images, num_images, epoch, n_batch, num_batches, normalize=True):
+    def log_images(self, mode, images, num_images, epoch, n_batch, num_batches, normalize=True):
         '''
         input images are expected in format (NCHW)
         '''
@@ -49,15 +49,15 @@ class Logger:
             images = images.transpose(1, 3)
 
         step = Logger._step(epoch, n_batch, num_batches)
-        img_name = '{}/images{}'.format(self.comment, '',step)
+        img_name = '{}/images{}'.format(mode+'_'+self.comment, '',step)
 
         # Make horizontal grid from image tensor
         horizontal_grid = vutils.make_grid(
             images, normalize=normalize, scale_each=True)
         # Make vertical grid from image tensor
-        nrows = int(np.sqrt(num_images))
-        grid = vutils.make_grid(
-            images, nrow=nrows, normalize=True, scale_each=True)
+        # nrows = int(np.sqrt(num_images))
+        # grid = vutils.make_grid(
+        #     images, nrow=nrows, normalize=True, scale_each=True)
 
         #print(type(horizontal_grid))
         # Add horizontal images to tensorboard

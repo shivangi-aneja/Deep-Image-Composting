@@ -116,7 +116,7 @@ def collapse(lapl_pyr):
 
 def main():
 
-    img_path = 'data_orig/toy_data/composite/'
+    img_path = 'data_orig/toy_data/deepharmonize/'
 
     for img in sorted(os.listdir(img_path)):
         if img.find('_') == -1:
@@ -199,7 +199,7 @@ def main():
             tmp.append(outimgg)
             tmp.append(outimgr)
             result = cv2.merge(tmp, result)
-            cv2.imwrite('data_orig/toy_data/blended/'+img+'_blended.png', result)
+            cv2.imwrite('data_orig/toy_data/blended/'+img.split(".")[0]+'_blended.png', result)
 
 
 if __name__ == '__main__':

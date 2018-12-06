@@ -100,9 +100,9 @@ class DeepGAN(object):
                 loss_g_, _ = self.sess.run([G_loss, G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
                 G_losses.append(loss_g_)
 
-                # Log the training losses
-                self.logger.log(d_error=loss_d_, g_error=loss_g_, epoch=epoch+1, n_batch=epoch_iter,
-                                num_batches=len(data_loader))
+            # Log the training losses
+            self.logger.log(d_error=0, g_error=np.mean(G_losses), epoch=epoch+1, n_batch=epoch,
+                            num_batches=0)
 
             epoch_end_time = time.time()
             per_epoch_ptime = epoch_end_time - epoch_start_time

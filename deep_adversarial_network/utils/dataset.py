@@ -87,7 +87,7 @@ class TOY_DATA(BaseDataset):
         # Training images
         image_tuple = np.load(dirpath + '/toy_data.npy')
 
-        train_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:5]])
+        train_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:17]])
         val_data = torch.stack([torch.Tensor(i) for i in image_tuple[17:18]])
 
         # train = CustomDataset1(comp_image=train_data[:,0,:,:], fg_img=train_data[:,1,:,:],

@@ -159,9 +159,9 @@ def main():
     input_dir1 = os.path.join(os.getcwd(), 'data/toy_data/background/')
     input_dir2 = os.path.join(os.getcwd(), 'data/toy_data/foreground/gt/')
     input_dir3 = os.path.join(os.getcwd(), 'data/toy_data/foreground/img/')
-    input_dir4 = os.path.join(os.getcwd(), 'data/toy_data/composite/')
-    input_dir5 = os.path.join(os.getcwd(), 'data/toy_data/blended/')
-    path = os.path.join(os.getcwd(), 'data/toy_data/')
+    input_dir4 = os.path.join(os.getcwd(), 'data/big_data/composite/')
+    input_dir5 = os.path.join(os.getcwd(), 'data/big_data/blended/')
+    path = os.path.join(os.getcwd(), 'data/big_data/')
 
     # For renaming
     # change_img_to_png(input_dir1)
@@ -175,7 +175,7 @@ def main():
     #resize_images(input_path = input_dir4)
     #resize_images(input_path = input_dir5)
 
-    save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='toy_data')
+    save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='big_data')
     # Save to numpy
     #save_to_numpy_array(fg_img_path=input_dir3, fg_mask_path=input_dir2, bg_path=input_dir1, path=path)
 

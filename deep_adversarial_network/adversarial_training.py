@@ -33,26 +33,27 @@ class DeepGAN(object):
         # variables : input
         comp_img = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         gt_img = tf.placeholder(tf.float32, shape=(None, 32,32,3))
+        z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 
         # networks : generator
-        G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
+        G_z = self.generator.make_generator_network(z, reuse=False, isTrain=isTrain)
 
         # networks : discriminator
-        #D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img,isTrain=isTrain)
-        #D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
+        D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img,isTrain=isTrain)
+        D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
 
         # loss for each network
-        # D_loss_real = tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(logits=D_real_logits, labels=tf.ones_like(D_real_logits)))
-        # D_loss_fake = tf.reduce_mean(
-        #     tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
-        # D_loss = D_loss_real + D_loss_fake
+        D_loss_real = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_real_logits, labels=tf.ones_like(D_real_logits)))
+        D_loss_fake = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+        D_loss = D_loss_real + D_loss_fake
         #D_loss = -tf.reduce_mean(tf.log(D_real) - tf.log(D_fake))
         #G_loss = -tf.reduce_mean(tf.log(D_fake))
-        G_loss1 = tf.reduce_mean(tf.losses.mean_squared_error(gt_img, G_z))
-        #G_loss2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
-        G_loss = G_loss1 #+ G_loss2
+        #G_loss1 = tf.reduce_mean(tf.losses.mean_squared_error(gt_img, G_z))
+        G_loss2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+        G_loss =  G_loss2
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()
@@ -61,7 +62,7 @@ class DeepGAN(object):
 
         # optimizer for each network
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-            #D_optim = self.d_optim(self.d_lr, beta1=0.5).minimize(D_loss, var_list=D_vars)
+            D_optim = self.d_optim(self.d_lr, beta1=0.5).minimize(D_loss, var_list=D_vars)
             G_optim = self.g_optim(self.g_lr, beta1=0.5).minimize(G_loss, var_list=G_vars)
 
         # open session and initialize all variables
@@ -93,7 +94,7 @@ class DeepGAN(object):
             for epoch_iter, (comp_image, gt_image) in enumerate(data_loader):
 
                 # update discriminator
-                loss_d_, _ = 0.,0#self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+                loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
                 D_losses.append(loss_d_)
 
                 # update generator
@@ -101,8 +102,8 @@ class DeepGAN(object):
                 G_losses.append(loss_g_)
 
             # Log the training losses
-            self.logger.log(d_error=0, g_error=np.mean(G_losses), epoch=epoch+1, n_batch=epoch,
-                            num_batches=0)
+            self.logger.log(d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch+1, n_batch=0,
+                            num_batches=1)
 
             epoch_end_time = time.time()
             per_epoch_ptime = epoch_end_time - epoch_start_time
@@ -170,3 +171,6 @@ class DeepGAN(object):
 
             self.logger.log_images(mode='ground_truth', images=np.array(gt_image), num_images=len(gt_image), epoch=num_epoch, n_batch=iter,
                               num_batches=len(test_loader), normalize=True)
+
+    def get_noise(batch_size, n_noise):
+        return np.random.normal(size=(batch_size, n_noise))

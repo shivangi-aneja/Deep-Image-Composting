@@ -34,7 +34,7 @@ MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # general
-parser.add_argument('-d', '--dataset', type=str, default='toy',
+parser.add_argument('-d', '--dataset', type=str, default='big',
                     help="dataset, {'" +\
                          "', '".join(get_available_datasets()) +\
                          "'}")

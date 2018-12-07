@@ -17,7 +17,7 @@ def change_img_to_png(input_path):
 # Resize images to be of size 400*350
 def resize_images(input_path):
 
-    new_size = (32,32)
+    new_size = (256,256)
     for image in sorted(os.listdir(input_path)):
         if image.endswith(".png"):
             img = cv2.imread(input_path+image)
@@ -172,8 +172,8 @@ def main():
     # resize_images(input_path = input_dir1)
     # resize_images(input_path = input_dir2)
     # resize_images(input_path = input_dir3)
-    #resize_images(input_path = input_dir4)
-    #resize_images(input_path = input_dir5)
+    resize_images(input_path = input_dir4)
+    resize_images(input_path = input_dir5)
 
     save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='big_data')
     # Save to numpy

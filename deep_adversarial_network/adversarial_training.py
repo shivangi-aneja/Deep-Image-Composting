@@ -51,9 +51,9 @@ class DeepGAN(object):
         D_loss = D_loss_real + D_loss_fake
         #D_loss = -tf.reduce_mean(tf.log(D_real) - tf.log(D_fake))
         #G_loss = -tf.reduce_mean(tf.log(D_fake))
-        #G_loss1 = tf.reduce_mean(tf.losses.mean_squared_error(gt_img, G_z))
+        G_loss1 = tf.reduce_mean(tf.losses.mean_squared_error(gt_img, G_z))
         G_loss2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
-        G_loss =  G_loss2
+        G_loss =  G_loss2 + 0.1 * G_loss1
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()

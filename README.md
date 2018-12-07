@@ -32,7 +32,7 @@ already been installed globally before.
 Whenever you want to use this *virtualenv* in a shell you have to first
 activate it by calling:
 
-`source .venv/bin/activate`
+`source venv/bin/activate`
 
 To test whether your *virtualenv* activation has worked, call:
 

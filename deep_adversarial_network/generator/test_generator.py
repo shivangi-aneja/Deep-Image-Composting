@@ -33,17 +33,17 @@ class test_Generator1():
 
             ### Bottleneck
 
-            fc4_reshape = tf.reshape(conv3_bn, shape = [ -1,256 * 256*256])
-            fc4 = tf.layers.dense(fc4_reshape, units=1024)
+            #fc4_reshape = tf.reshape(conv3_bn, shape = [ -1,256 * 256*256])
+            #fc4 = tf.layers.dense(fc4_reshape, units=1024)
 
-            fc5 = tf.layers.dense(fc4, units=32*32*256)
+            #fc5 = tf.layers.dense(fc4, units=32*32*256)
 
-            fc5_reshape = tf.reshape(fc5, shape=[-1, 256 , 256 , 256])
+            #fc5_reshape = tf.reshape(fc5, shape=[-1, 256 , 256 , 256])
 
 
             ### Decoder
 
-            deconv3 = tf.layers.conv2d_transpose(inputs=fc5_reshape, filters=256, kernel_size=(3, 3), padding='same',
+            deconv3 = tf.layers.conv2d_transpose(inputs=conv3_bn, filters=256, kernel_size=(3, 3), padding='same',
                                                  activation=tf.nn.leaky_relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
             deconv3_bn = tf.layers.batch_normalization(deconv3)
 

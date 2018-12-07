@@ -33,7 +33,7 @@ class test_Generator1():
 
             ### Bottleneck
 
-            fc4_reshape = tf.reshape(conv3_bn, shape = [ -1,500 * 375*256])
+            fc4_reshape = tf.reshape(conv3_bn, shape = [ -1,256 * 256*256])
             fc4 = tf.layers.dense(fc4_reshape, units=1024)
 
             fc5 = tf.layers.dense(fc4, units=32*32*256)

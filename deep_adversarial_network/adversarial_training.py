@@ -31,13 +31,13 @@ class DeepGAN(object):
     def adversarial_train(self, data_loader,test_loader, model_path):
 
         # variables : input
-        comp_img = tf.placeholder(tf.float32, shape=(None, 32,32,3))
-        gt_img = tf.placeholder(tf.float32, shape=(None, 32,32,3))
-        z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
+        comp_img = tf.placeholder(tf.float32, shape=(None, 256,256,3))
+        gt_img = tf.placeholder(tf.float32, shape=(None, 256,256,3))
+        #z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 
         # networks : generator
-        G_z = self.generator.make_generator_network(z, reuse=False, isTrain=isTrain)
+        G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
 
         # networks : discriminator
         D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img,isTrain=isTrain)

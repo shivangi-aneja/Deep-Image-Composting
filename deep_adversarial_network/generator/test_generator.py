@@ -38,7 +38,7 @@ class test_Generator1():
 
             fc5 = tf.layers.dense(fc4, units=32*32*256)
 
-            fc5_reshape = tf.reshape(fc5, shape=[-1, 500 , 375 , 256])
+            fc5_reshape = tf.reshape(fc5, shape=[-1, 256 , 256 , 256])
 
 
             ### Decoder

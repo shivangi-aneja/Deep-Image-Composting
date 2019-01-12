@@ -103,8 +103,8 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
 
     composite_img_tuple = []
     # For each foreground
-    ctr = 0
-    for fg_img in sorted(os.listdir(fg_img_path)):
+    ctr = 22446
+    for fg_img in sorted(os.listdir(fg_img_path))[130:]:
         for bg_img in sorted(os.listdir(bg_path)):
 
             try:
@@ -135,20 +135,16 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
                     cv2.imwrite(comp_img_path+str(ctr)+'_fg.png', fg)
                     cv2.imwrite(comp_img_path+str(ctr)+'_bg.png', bg)
                     cv2.imwrite(comp_img_path+str(ctr)+'_mask.png', alpha*255)
-                    composite_img_tuple.append((out_image, fg, alpha*255, bg))
+                    #composite_img_tuple.append((out_image, fg, alpha*255, bg))
                     ctr += 1
                     print(ctr)
             except:
                 print(fg_img_path+fg_img)
                 print(fg_mask_path+fg_img)
                 print(bg_path+bg_img)
-        #     if ctr == 5000:
-        #         break
-        # if ctr == 500:
-        #     break
 
-    name_mask = 'composite.npy'
-    np.save(os.path.join(comp_file_path + name_mask), composite_img_tuple)
+    # name_mask = 'composite.npy'
+    # np.save(os.path.join(comp_file_path + name_mask), composite_img_tuple)
 
 
 

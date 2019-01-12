@@ -6,6 +6,7 @@ from IPython import display
 import os, itertools, time, pickle
 import numpy as np
 import matplotlib.pyplot as plt
+from deep_adversarial_network.metrics.metric_eval import (calc_mse_psnr)
 from torchvision.utils import make_grid
 import torch
 
@@ -31,8 +32,8 @@ class DeepGAN(object):
     def adversarial_train(self, data_loader,test_loader, model_path):
 
         # variables : input
-        comp_img = tf.placeholder(tf.float32, shape=(None, 256,256,3))
-        gt_img = tf.placeholder(tf.float32, shape=(None, 256,256,3))
+        comp_img = tf.placeholder(tf.float32, shape=(None, 400,300,3))
+        gt_img = tf.placeholder(tf.float32, shape=(None, 400,300,3))
         #z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 
@@ -162,9 +163,16 @@ class DeepGAN(object):
 
     def evaluate_test_data(self,test_loader, num_epoch, G_z,comp_img,gt_img,isTrain,show=False, save=False, path='result',tf_log_path=None):
 
-
+        mse_avg_total = 0.0
+        psnr_avg_total = 0.0
+        num_iter = len(test_loader)
         for iter,(comp_image, gt_image) in enumerate(test_loader):
             test_images = self.sess.run(G_z, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
+
+            mse_avg_iter, psnr_avg_iter = calc_mse_psnr(comp_image, gt_image)
+
+            mse_avg_total += mse_avg_iter
+            psnr_avg_total += psnr_avg_iter
 
             self.logger.log_images(mode='generated',images=test_images, num_images=len(test_images), epoch=num_epoch, n_batch=iter,
                                    num_batches=len(test_loader), normalize=True)
@@ -172,5 +180,11 @@ class DeepGAN(object):
             self.logger.log_images(mode='ground_truth', images=np.array(gt_image), num_images=len(gt_image), epoch=num_epoch, n_batch=iter,
                               num_batches=len(test_loader), normalize=True)
 
-    def get_noise(batch_size, n_noise):
-        return np.random.normal(size=(batch_size, n_noise))
+        mse_avg_total /= num_iter
+        psnr_avg_total /=num_iter
+
+        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
+
+
+    # def get_noise(batch_size, n_noise):
+    #     return np.random.normal(size=(batch_size, n_noise))

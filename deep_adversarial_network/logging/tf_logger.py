@@ -40,6 +40,22 @@ class Logger:
         self.writer.add_scalar(
             '{}/G_error'.format(self.comment), g_error, step)
 
+
+    def log_scores(self, mse, psnr, epoch):
+
+        # var_class = torch.autograd.variable.Variable
+        if isinstance(mse, torch.autograd.Variable):
+            mse = mse.data.cpu().numpy()
+        if isinstance(psnr, torch.autograd.Variable):
+            psnr = psnr.data.cpu().numpy()
+
+        step = Logger._step(epoch, n_batch=0, num_batches=1)
+        self.writer.add_scalar(
+            '{}/mse'.format(self.comment), mse, step)
+        self.writer.add_scalar(
+            '{}/psnr'.format(self.comment), psnr, step)
+
+
     def log_images(self, mode, images, num_images, epoch, n_batch, num_batches, normalize=True):
         '''
         input images are expected in format (NCHW)

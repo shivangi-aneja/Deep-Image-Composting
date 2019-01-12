@@ -30,7 +30,7 @@ class test_Discriminator1(object):
                                      activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv4_bn = tf.layers.batch_normalization(conv4)
 
-            fc4_reshape = tf.reshape(conv4_bn, shape=[-1, 256 * 256 * 256])
+            fc4_reshape = tf.reshape(conv4_bn, shape=[-1, 300 * 400 * 256])
             logits = tf.layers.dense(fc4_reshape, units=1)
             out = tf.nn.sigmoid(logits)
 

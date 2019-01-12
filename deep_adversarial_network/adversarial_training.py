@@ -32,8 +32,8 @@ class DeepGAN(object):
     def adversarial_train(self, data_loader,test_loader, model_path):
 
         # variables : input
-        comp_img = tf.placeholder(tf.float32, shape=(None, 400,300,3))
-        gt_img = tf.placeholder(tf.float32, shape=(None, 400,300,3))
+        comp_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
+        gt_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
         #z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 

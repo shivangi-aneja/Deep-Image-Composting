@@ -2,7 +2,7 @@
 .ipynb_checkpoints/*
 *.pyc
 !.gitkeep
-data_orig/*
+data/*
 logs/*
 tf_logs/*
 venv/*

@@ -22,15 +22,15 @@ class test_Discriminator1(object):
                                      activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv2_bn = tf.layers.batch_normalization(conv2)
 
-            conv3 = tf.layers.conv2d(inputs=conv2_bn, filters=128, kernel_size=(3, 3), padding='same',
-                                     activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
-            conv3_bn = tf.layers.batch_normalization(conv3)
+            # conv3 = tf.layers.conv2d(inputs=conv2_bn, filters=128, kernel_size=(3, 3), padding='same',
+            #                          activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
+            # conv3_bn = tf.layers.batch_normalization(conv3)
+            #
+            # conv4 = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), padding='same',
+            #                          activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
+            # conv4_bn = tf.layers.batch_normalization(conv4)
 
-            conv4 = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), padding='same',
-                                     activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
-            conv4_bn = tf.layers.batch_normalization(conv4)
-
-            fc4_reshape = tf.reshape(conv4_bn, shape=[-1, 300 * 400 * 256])
+            fc4_reshape = tf.reshape(conv2_bn, shape=[-1, 300 * 400 * 64])
             logits = tf.layers.dense(fc4_reshape, units=1)
             out = tf.nn.sigmoid(logits)
 

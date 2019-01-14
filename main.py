@@ -162,7 +162,7 @@ def main(args=args):
                     dataset=args.dataset, batch_size=args.batch_size, d_optim=d_optim, g_optim=g_optim, d_lr=d_lr, g_lr=g_lr,
                     epochs=args.epochs, mplib=mplib, tf_log_path=tf_log_path)
     # Train the model
-    model.adversarial_train(data_loader=train_loader,test_loader=val_loader, model_path=MODEL_PATH)
+    model.adversarial_train(train_loader=train_loader,test_loader=val_loader, model_path=MODEL_PATH)
 
 
 if __name__ == '__main__':

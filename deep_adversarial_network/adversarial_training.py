@@ -29,7 +29,7 @@ class DeepGAN(object):
         # Tensorboard Logging
         self.logger = Logger(model_name=self.model_name, data_name=self.dataset, log_path=tf_log_path)
 
-    def adversarial_train(self, data_loader,test_loader, model_path):
+    def adversarial_train(self, train_loader,test_loader, model_path):
 
         # variables : input
         comp_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
@@ -92,7 +92,7 @@ class DeepGAN(object):
             epoch_start_time = time.time()
             G_losses = []
             D_losses = []
-            for epoch_iter, (comp_image, gt_image) in enumerate(data_loader):
+            for epoch_iter, (comp_image, gt_image) in enumerate(train_loader):
 
                 # update discriminator
                 loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})

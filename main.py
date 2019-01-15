@@ -89,7 +89,7 @@ parser.add_argument('-e', '--epochs', type=int, default=5,
 parser.add_argument('-tf', '--tf_logs', type=str, default='tf_logs',
                     help="log folder for tensorflow logging")
 
-parser.add_argument('-mp', '--plot_matplotlib', type=str, default='y',
+parser.add_argument('-mp', '--plot_matplotlib', type=str, default='n',
                     help="whether to plot matplotlib plots")
 
 

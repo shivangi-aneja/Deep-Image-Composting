@@ -14,6 +14,21 @@ class DeepGAN(object):
 
     def __init__(self, discriminator, generator, model_name, dataset, batch_size,
                  d_optim=None, g_optim=None, d_lr=1e-4, g_lr=1e-4, mplib=False, epochs=10,tf_log_path=None):
+        """
+        Initialize all the parameters
+        :param discriminator: discriminator model
+        :param generator: generator model
+        :param model_name: model name
+        :param dataset: dataset
+        :param batch_size: batch size
+        :param d_optim: Optimizer for discriminator
+        :param g_optim: Optimizer for generator
+        :param d_lr: Learning Rate for discriminator
+        :param g_lr: Learning Rate for generator
+        :param mplib: Plotting for Matplotlib
+        :param epochs: Epochs
+        :param tf_log_path: Folder for Tensorflow
+        """
         self.d_optim = d_optim or tf.train.AdamOptimizer
         self.g_optim = g_optim or tf.train.AdamOptimizer
         self.discriminator = discriminator
@@ -30,6 +45,19 @@ class DeepGAN(object):
         self.logger = Logger(model_name=self.model_name, data_name=self.dataset, log_path=tf_log_path)
 
     def adversarial_train(self, train_loader,test_loader, model_path):
+        """
+        Function for adversarial training
+        :param train_loader: Loader for training data
+        :param test_loader: Loader for test data
+        :param model_path: Path for saving the data
+        :return:
+        """
+
+        # Name to store the GAN model
+        gan_model_name = model_path+self.model_name+".ckpt"
+
+        # 'Saver' op to save and restore all the variables
+        saver = tf.train.Saver()
 
         # variables : input
         comp_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
@@ -67,8 +95,15 @@ class DeepGAN(object):
             G_optim = self.g_optim(self.g_lr, beta1=0.5).minimize(G_loss, var_list=G_vars)
 
         # open session and initialize all variables
-        self.sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
+        # Try to restore model weights from previously saved model
+        try:
+            init = tf.global_variables_initializer()
+            self.sess.run(init)
+            saver.restore(self.sess, model_path)
+        except:
+            tf.global_variables_initializer().run()
+            self.sess = tf.InteractiveSession()
+
 
         # results save folder
         model = model_path+self.model_name
@@ -76,6 +111,8 @@ class DeepGAN(object):
             os.mkdir(model)
         if not os.path.isdir(model + '_fixed_results'):
             os.mkdir(model + '_fixed_results')
+
+
 
         train_hist = {}
         train_hist['D_losses'] = []
@@ -116,6 +153,11 @@ class DeepGAN(object):
             self.evaluate_test_data(num_epoch=(epoch+1), test_loader=test_loader, G_z=G_z, comp_img=comp_img,
                                     gt_img=gt_img,isTrain=isTrain, show=False, save=True, path=fixed_p)
 
+            # Save the model after every 10 epochs
+            if (epoch+1)%10 == 0:
+                # Save model weights to disk
+                save_path = saver.save(self.sess, gan_model_name)
+                rootLogger.info("Model saved in file: %s" % save_path)
 
             if self.mplib:
                 train_hist['D_losses'].append(np.mean(D_losses))
@@ -138,6 +180,14 @@ class DeepGAN(object):
         self.sess.close()
 
     def show_train_hist(self,hist, show=False, save=False, path='Train_hist.png'):
+        """
+        Matplotlib plotting
+        :param hist:
+        :param show:
+        :param save:
+        :param path:
+        :return:
+        """
         x = range(len(hist['D_losses']))
 
         y1 = hist['D_losses']
@@ -161,8 +211,22 @@ class DeepGAN(object):
         else:
             plt.close()
 
-    def evaluate_test_data(self,test_loader, num_epoch, G_z,comp_img,gt_img,isTrain,show=False, save=False, path='result',tf_log_path=None):
-
+    def evaluate_test_data(self,test_loader, num_epoch, G_z,comp_img,gt_img,isTrain,
+                           show=False, save=False, path='result',tf_log_path=None):
+        """
+        Function to evaluate the result on test data
+        :param test_loader: Loader for test data
+        :param num_epoch: Epoch Number
+        :param G_z: Random Gaussian Noise vector
+        :param comp_img: Composite Image Hol
+        :param gt_img:
+        :param isTrain:
+        :param show:
+        :param save:
+        :param path:
+        :param tf_log_path:
+        :return:
+        """
         mse_avg_total = 0.0
         psnr_avg_total = 0.0
         num_iter = len(test_loader)
@@ -183,6 +247,7 @@ class DeepGAN(object):
         mse_avg_total /= num_iter
         psnr_avg_total /=num_iter
 
+        rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]"%(num_epoch,mse_avg_total,psnr_avg_total))
         self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
 
 

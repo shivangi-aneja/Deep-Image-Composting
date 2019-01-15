@@ -41,6 +41,7 @@ def calc_mse_psnr(img_list1, img_list2):
 
     return  total_mse/num_imgs, total_psnr/num_imgs
 
+
 def d_accuracy(real_prob, fake_prob):
     label_real = tf.ones(shape = real_prob.shape[0])
     label_fake = tf.zeros(shape = fake_prob.shape[0])

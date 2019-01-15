@@ -155,8 +155,10 @@ class DeepGAN(object):
             fixed_p = model_path + 'Fixed_results/' + model + str(epoch + 1) + '.png'
 
             # Evaluate the model after every epoch
-            self.evaluate_test_data(num_epoch=(epoch+1), test_loader=test_loader, G_z=G_z, comp_img=comp_img,
-                                    gt_img=gt_img,isTrain=isTrain, show=False, save=True, path=fixed_p)
+            self.evaluate_test_data(num_epoch=(epoch+1), test_loader=test_loader, G_z=G_z, D_fake =D_fake,
+                                    D_fake_logits = D_fake_logits, D_real = D_real, D_real_logits = D_real_logits,
+                                    D_loss = D_loss, G_loss = G_loss, comp_img=comp_img, gt_img=gt_img,
+                                    isTrain=isTrain, show=False, save=True, path=fixed_p)
 
             # Save the model after every 10 epochs
             if (epoch+1)%10 == 0:
@@ -217,8 +219,9 @@ class DeepGAN(object):
         else:
             plt.close()
 
-    def evaluate_test_data(self,test_loader, num_epoch, G_z,comp_img,gt_img,isTrain,
-                           show=False, save=False, path='result',tf_log_path=None):
+    def evaluate_test_data(self,test_loader, num_epoch, G_z, D_fake, D_fake_logits, D_real, D_real_logits,
+                           D_loss, G_loss, comp_img,gt_img,isTrain, show=False, save=False,
+                           path='result',tf_log_path=None):
         """
         Function to evaluate the result on test data
         :param test_loader: Loader for test data
@@ -236,6 +239,9 @@ class DeepGAN(object):
         mse_avg_total = 0.0
         psnr_avg_total = 0.0
         Disc_accuracy_total = 0.0
+        val_G_losses = []
+        val_D_losses = []
+
         num_iter = len(test_loader)
         for iter,(comp_image, gt_image) in enumerate(test_loader):
             test_images = self.sess.run(G_z, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
@@ -252,6 +258,13 @@ class DeepGAN(object):
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy
 
+            val_loss_d_, _ = self.sess.run(D_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+            val_D_losses.append(val_loss_d_)
+
+            # update generator
+            val_loss_g_, _ = self.sess.run(G_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+            val_G_losses.append(val_loss_g_)
+
             self.logger.log_images(mode='generated',images=test_images, num_images=len(test_images), epoch=num_epoch, n_batch=iter,
                                    num_batches=len(test_loader), normalize=True)
 
@@ -259,14 +272,18 @@ class DeepGAN(object):
                               num_batches=len(test_loader), normalize=True)
 
         mse_avg_total /= num_iter
-        psnr_avg_total /=num_iter
-        Disc_accuracy_total /=num_iter
+        psnr_avg_total /= num_iter
+        Disc_accuracy_total /= num_iter
 
         rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]"%(num_epoch,mse_avg_total,psnr_avg_total))
         self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
 
-        rootLogger.info("Epoch %d  Disc_Acc = [%.4f] "%(num_epoch,Disc_accuarcy_total))
-        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch) 
+        rootLogger.info("Epoch %d  loss_d= [%.3f], loss_g= [%.3f]"%(num_epoch, np.mean(val_D_losses), np.mean(val_G_losses)))
+        self.logger.log(d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=epoch + 1, n_batch=0,
+                        num_batches=1)
+
+        rootLogger.info("Epoch %d  Disc_Acc = [%.4f] "%(num_epoch, Disc_accuracy_total))
+        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
         #self.logger.log_scores(disc_acc=Disc_accuracy_total,epoch=num_epoch)
 
 

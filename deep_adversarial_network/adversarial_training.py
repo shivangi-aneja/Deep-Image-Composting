@@ -54,7 +54,7 @@ class DeepGAN(object):
         """
 
         # Name to store the GAN model
-        gan_model_name = model_path+self.model_name+".ckpt"
+        gan_model_name = model_path+self.model_name+"_model_ckpt/"+self.model_name+".ckpt"
 
         # variables : input
         comp_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
@@ -100,7 +100,7 @@ class DeepGAN(object):
             saver = tf.train.Saver()
             init = tf.global_variables_initializer()
             self.sess.run(init)
-            saver.restore(self.sess, model_path)
+            saver.restore(self.sess, gan_model_name)
             rootLogger.info("Saved Model successfully loaded")
         except:
             tf.global_variables_initializer().run()

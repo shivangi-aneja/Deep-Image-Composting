@@ -116,7 +116,7 @@ class BIG_DATA(BaseDataset):
 
     def _load(self, dirpath):
         # Training images
-        train_tuple = np.load(dirpath + '/val.npy')
+        train_tuple = np.load(dirpath + '/train.npy')
         val_tuple = np.load(dirpath + '/val.npy')
 
         train_data = torch.stack([torch.Tensor(i) for i in train_tuple])

@@ -93,16 +93,18 @@ class DeepGAN(object):
 
         # open session and initialize all variables
         # Try to restore model weights from previously saved model
+        self.sess = tf.InteractiveSession()
         try:
             # 'Saver' op to save and restore all the variables
+            rootLogger.info("Loading Saved Model")
             saver = tf.train.Saver()
             init = tf.global_variables_initializer()
             self.sess.run(init)
             saver.restore(self.sess, model_path)
+            rootLogger.info("Saved Model successfully loaded")
         except:
             tf.global_variables_initializer().run()
-            self.sess = tf.InteractiveSession()
-
+            rootLogger.info("Model not found, Created a new one")
 
         # results save folder
         model = model_path+self.model_name

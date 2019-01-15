@@ -175,7 +175,7 @@ class DeepGAN(object):
         rootLogger.info("Training finish!!!... Save Training Results")
         with open(model + 'train_hist.pkl', 'wb') as f:
             pickle.dump(train_hist, f)
-        rootLogger.info("Model Saved")
+        rootLogger.info("Training history Saved")
 
         if self.mplib:
             self.show_train_hist(train_hist, save=True, path= model + 'train_hist.png')

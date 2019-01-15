@@ -108,12 +108,15 @@ class DeepGAN(object):
 
         # results save folder
         model = model_path+self.model_name
-        if not os.path.isdir(model):
-            os.mkdir(model)
-        if not os.path.isdir(model + '_fixed_results'):
-            os.mkdir(model + '_fixed_results')
+        if self.mplib:
+            if not os.path.isdir(model):
+                os.mkdir(model)
+            if not os.path.isdir(model + '_fixed_results'):
+                os.mkdir(model + '_fixed_results')
 
-
+        # Make directory for Saving Models
+        if not os.path.isdir(model_path+self.model_name+"_model_ckpt"):
+            os.mkdir(model_path+self.model_name+"_model_ckpt")
 
         train_hist = {}
         train_hist['D_losses'] = []
@@ -170,14 +173,13 @@ class DeepGAN(object):
         end_time = time.time()
         total_ptime = end_time - start_time
         train_hist['total_ptime'].append(total_ptime)
-
         rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
-        rootLogger.info("Training finish!!!... Save Training Results")
-        with open(model + 'train_hist.pkl', 'wb') as f:
-            pickle.dump(train_hist, f)
-        rootLogger.info("Training history Saved")
+        rootLogger.info("Training finish!!!...")
 
         if self.mplib:
+            with open(model + 'train_hist.pkl', 'wb') as f:
+                pickle.dump(train_hist, f)
+            rootLogger.info("Training history Saved")
             self.show_train_hist(train_hist, save=True, path= model + 'train_hist.png')
 
         self.sess.close()

@@ -7,6 +7,7 @@ import os, itertools, time, pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from deep_adversarial_network.metrics.metric_eval import (calc_mse_psnr)
+from deep_adversarial_network.metrics.metric_eval import (d_accuracy)
 from torchvision.utils import make_grid
 import torch
 
@@ -234,14 +235,22 @@ class DeepGAN(object):
         """
         mse_avg_total = 0.0
         psnr_avg_total = 0.0
+        Disc_accuracy_total = 0.0
         num_iter = len(test_loader)
         for iter,(comp_image, gt_image) in enumerate(test_loader):
             test_images = self.sess.run(G_z, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
 
-            mse_avg_iter, psnr_avg_iter = calc_mse_psnr(comp_image, gt_image)
+            mse_avg_iter, psnr_avg_iter = calc_mse_psnr(test_images, gt_image)
 
             mse_avg_total += mse_avg_iter
             psnr_avg_total += psnr_avg_iter
+
+
+            D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
+            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: comp_image, isTrain: False})
+
+            Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
+            Disc_accuracy_total += Disc_accuracy
 
             self.logger.log_images(mode='generated',images=test_images, num_images=len(test_images), epoch=num_epoch, n_batch=iter,
                                    num_batches=len(test_loader), normalize=True)
@@ -251,9 +260,14 @@ class DeepGAN(object):
 
         mse_avg_total /= num_iter
         psnr_avg_total /=num_iter
+        Disc_accuracy_total /=num_iter
 
         rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]"%(num_epoch,mse_avg_total,psnr_avg_total))
         self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
+
+        rootLogger.info("Epoch %d  Disc_Acc = [%.4f] "%(num_epoch,Disc_accuarcy_total))
+        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch) 
+        #self.logger.log_scores(disc_acc=Disc_accuracy_total,epoch=num_epoch)
 
 
     # def get_noise(batch_size, n_noise):

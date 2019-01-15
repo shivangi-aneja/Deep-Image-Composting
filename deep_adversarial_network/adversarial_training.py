@@ -56,9 +56,6 @@ class DeepGAN(object):
         # Name to store the GAN model
         gan_model_name = model_path+self.model_name+".ckpt"
 
-        # 'Saver' op to save and restore all the variables
-        saver = tf.train.Saver()
-
         # variables : input
         comp_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
         gt_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
@@ -97,6 +94,8 @@ class DeepGAN(object):
         # open session and initialize all variables
         # Try to restore model weights from previously saved model
         try:
+            # 'Saver' op to save and restore all the variables
+            saver = tf.train.Saver()
             init = tf.global_variables_initializer()
             self.sess.run(init)
             saver.restore(self.sess, model_path)
@@ -155,6 +154,8 @@ class DeepGAN(object):
 
             # Save the model after every 10 epochs
             if (epoch+1)%10 == 0:
+                # 'Saver' op to save and restore all the variables
+                saver = tf.train.Saver()
                 # Save model weights to disk
                 save_path = saver.save(self.sess, gan_model_name)
                 rootLogger.info("Model saved in file: %s" % save_path)

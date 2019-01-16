@@ -45,8 +45,8 @@ def calc_mse_psnr(img_list1, img_list2):
 def d_accuracy(real_prob, fake_prob):
     label_real = tf.ones(shape = real_prob.shape[0])
     label_fake = tf.zeros(shape = fake_prob.shape[0])
-    real_pred = tf.math.round(real_prob)
-    fake_pred = tf.math.round(fake_prob)
+    real_pred = tf.round(real_prob)
+    fake_pred = tf.round(fake_prob)
     acc_real = tf.metrics.accuracy(label_real, real_pred)
     acc_fake = tf.metrics.accuracy(label_fake, fake_pred)
 

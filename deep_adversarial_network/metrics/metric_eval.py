@@ -25,7 +25,7 @@ def calc_mse_psnr(img_list1, img_list2):
     total_psnr = 0.
 
     for i in range(num_imgs):
-        im1 = img_list1[i].numpy()
+        im1 = img_list1[i]
         im2 = img_list2[i].numpy()
         mse_val = calc_mse(im1,im2)
         if mse_val == 0.:
@@ -43,13 +43,12 @@ def calc_mse_psnr(img_list1, img_list2):
 
 
 def d_accuracy(real_prob, fake_prob):
-    label_real = tf.ones(shape = real_prob.shape[0])
-    label_fake = tf.zeros(shape = fake_prob.shape[0])
-    real_pred = tf.math.round(real_prob)
-    fake_pred = tf.math.round(fake_prob)
-    acc_real = tf.metrics.accuracy(label_real, real_pred)
-    acc_fake = tf.metrics.accuracy(label_fake, fake_pred)
-
-    return tf.metrics.mean([acc_real, acc_fake])
+    label_real = np.ones(shape = real_prob.shape[0])
+    label_fake = np.zeros(shape = fake_prob.shape[0])
+    real_pred = round(real_prob)
+    fake_pred = round(fake_prob)
+    acc_real = (label_real == real_pred).mean()
+    acc_fake = (label_fake == fake_pred).mean()
+    return np.mean([acc_real, acc_fake])
 
 

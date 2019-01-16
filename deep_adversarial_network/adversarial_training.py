@@ -1,20 +1,21 @@
+import os
+import pickle
+import time
 
-from deep_adversarial_network.utils.common_util import *
-from deep_adversarial_network.logging.tf_logger import Logger
-from deep_adversarial_network.logging.logger import rootLogger
-from IPython import display
-import os, itertools, time, pickle
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+from deep_adversarial_network.logging.logger import rootLogger
+from deep_adversarial_network.logging.tf_logger import Logger
 from deep_adversarial_network.metrics.metric_eval import (calc_mse_psnr)
 from deep_adversarial_network.metrics.metric_eval import (d_accuracy)
-from torchvision.utils import make_grid
-import torch
+from deep_adversarial_network.utils.common_util import *
+
 
 class DeepGAN(object):
 
     def __init__(self, discriminator, generator, model_name, dataset, batch_size,
-                 d_optim=None, g_optim=None, d_lr=1e-4, g_lr=1e-4, mplib=False, epochs=10,tf_log_path=None):
+                 d_optim=None, g_optim=None, d_lr=1e-4, g_lr=1e-4, mplib=False, epochs=10, tf_log_path=None):
         """
         Initialize all the parameters
         :param discriminator: discriminator model
@@ -45,7 +46,7 @@ class DeepGAN(object):
         # Tensorboard Logging
         self.logger = Logger(model_name=self.model_name, data_name=self.dataset, log_path=tf_log_path)
 
-    def adversarial_train(self, train_loader,test_loader, model_path):
+    def adversarial_train(self, train_loader, test_loader, model_path):
         """
         Function for adversarial training
         :param train_loader: Loader for training data
@@ -55,19 +56,19 @@ class DeepGAN(object):
         """
 
         # Name to store the GAN model
-        gan_model_name = model_path+self.model_name+"_model_ckpt/"+self.model_name+".ckpt"
+        gan_model_name = model_path + self.model_name + "_model_ckpt/" + self.model_name + ".ckpt"
 
         # variables : input
-        comp_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
-        gt_img = tf.placeholder(tf.float32, shape=(None, 300,400,3))
-        #z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
+        comp_img = tf.placeholder(tf.float32, shape=(None, 300, 400, 3))
+        gt_img = tf.placeholder(tf.float32, shape=(None, 300, 400, 3))
+        # z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 
         # networks : generator
         G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
 
         # networks : discriminator
-        D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img,isTrain=isTrain)
+        D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
         D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
 
         # loss for each network
@@ -76,11 +77,12 @@ class DeepGAN(object):
         D_loss_fake = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
         D_loss = D_loss_real + D_loss_fake
-        #D_loss = -tf.reduce_mean(tf.log(D_real) - tf.log(D_fake))
-        #G_loss = -tf.reduce_mean(tf.log(D_fake))
+        # D_loss = -tf.reduce_mean(tf.log(D_real) - tf.log(D_fake))
+        # G_loss = -tf.reduce_mean(tf.log(D_fake))
         G_loss1 = tf.reduce_mean(tf.losses.mean_squared_error(gt_img, G_z))
-        G_loss2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
-        G_loss =  G_loss2 + 0.1 * G_loss1
+        G_loss2 = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+        G_loss = G_loss2 + 0.1 * G_loss1
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()
@@ -108,7 +110,7 @@ class DeepGAN(object):
             rootLogger.info("Model not found, Created a new one")
 
         # results save folder
-        model = model_path+self.model_name
+        model = model_path + self.model_name
         if self.mplib:
             if not os.path.isdir(model):
                 os.mkdir(model)
@@ -116,8 +118,8 @@ class DeepGAN(object):
                 os.mkdir(model + '_fixed_results')
 
         # Make directory for Saving Models
-        if not os.path.isdir(model_path+self.model_name+"_model_ckpt"):
-            os.mkdir(model_path+self.model_name+"_model_ckpt")
+        if not os.path.isdir(model_path + self.model_name + "_model_ckpt"):
+            os.mkdir(model_path + self.model_name + "_model_ckpt")
 
         train_hist = {}
         train_hist['D_losses'] = []
@@ -135,7 +137,6 @@ class DeepGAN(object):
             G_losses = []
             D_losses = []
             for epoch_iter, (comp_image, gt_image) in enumerate(train_loader):
-
                 # update discriminator
                 loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
                 D_losses.append(loss_d_)
@@ -145,23 +146,23 @@ class DeepGAN(object):
                 G_losses.append(loss_g_)
 
             # Log the training losses
-            self.logger.log(d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch+1, n_batch=0,
+            self.logger.log(mode="train", d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch + 1, n_batch=0,
                             num_batches=1)
 
             epoch_end_time = time.time()
             per_epoch_ptime = epoch_end_time - epoch_start_time
             rootLogger.info('[%d/%d] - ptime: %.2f loss_d: %.3f, loss_g: %.3f' %
-                  ((epoch+1), self.epochs, per_epoch_ptime, np.mean(D_losses), np.mean(G_losses)))
+                            ((epoch + 1), self.epochs, per_epoch_ptime, np.mean(D_losses), np.mean(G_losses)))
             fixed_p = model_path + 'Fixed_results/' + model + str(epoch + 1) + '.png'
 
             # Evaluate the model after every epoch
-            self.evaluate_test_data(num_epoch=(epoch+1), test_loader=test_loader, G_z=G_z, D_fake =D_fake,
-                                    D_fake_logits = D_fake_logits, D_real = D_real, D_real_logits = D_real_logits,
-                                    D_loss = D_loss, G_loss = G_loss, comp_img=comp_img, gt_img=gt_img,
+            self.evaluate_test_data(num_epoch=(epoch + 1), test_loader=test_loader, G_z=G_z, D_fake=D_fake,
+                                    D_fake_logits=D_fake_logits, D_real=D_real, D_real_logits=D_real_logits,
+                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img, gt_img=gt_img,
                                     isTrain=isTrain, show=False, save=True, path=fixed_p)
 
             # Save the model after every 10 epochs
-            if (epoch+1)%10 == 0:
+            if (epoch + 1) % 10 == 0:
                 # 'Saver' op to save and restore all the variables
                 saver = tf.train.Saver()
                 # Save model weights to disk
@@ -176,6 +177,9 @@ class DeepGAN(object):
         end_time = time.time()
         total_ptime = end_time - start_time
         train_hist['total_ptime'].append(total_ptime)
+        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (
+        np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+
         rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
         rootLogger.info("Training finish!!!...")
 
@@ -183,11 +187,11 @@ class DeepGAN(object):
             with open(model + 'train_hist.pkl', 'wb') as f:
                 pickle.dump(train_hist, f)
             rootLogger.info("Training history Saved")
-            self.show_train_hist(train_hist, save=True, path= model + 'train_hist.png')
+            self.show_train_hist(train_hist, save=True, path=model + 'train_hist.png')
 
         self.sess.close()
 
-    def show_train_hist(self,hist, show=False, save=False, path='Train_hist.png'):
+    def show_train_hist(self, hist, show=False, save=False, path='Train_hist.png'):
         """
         Matplotlib plotting
         :param hist:
@@ -219,9 +223,9 @@ class DeepGAN(object):
         else:
             plt.close()
 
-    def evaluate_test_data(self,test_loader, num_epoch, G_z, D_fake, D_fake_logits, D_real, D_real_logits,
-                           D_loss, G_loss, comp_img,gt_img,isTrain, show=False, save=False,
-                           path='result',tf_log_path=None):
+    def evaluate_test_data(self, test_loader, num_epoch, G_z, D_fake, D_fake_logits, D_real, D_real_logits,
+                           D_loss, G_loss, D_optim, G_optim, comp_img, gt_img, isTrain, show=False, save=False,
+                           path='result', tf_log_path=None):
         """
         Function to evaluate the result on test data
         :param test_loader: Loader for test data
@@ -243,7 +247,7 @@ class DeepGAN(object):
         val_D_losses = []
 
         num_iter = len(test_loader)
-        for iter,(comp_image, gt_image) in enumerate(test_loader):
+        for iter, (comp_image, gt_image) in enumerate(test_loader):
             test_images = self.sess.run(G_z, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
 
             mse_avg_iter, psnr_avg_iter = calc_mse_psnr(test_images, gt_image)
@@ -251,41 +255,38 @@ class DeepGAN(object):
             mse_avg_total += mse_avg_iter
             psnr_avg_total += psnr_avg_iter
 
-
             D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
             D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: comp_image, isTrain: False})
 
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy
 
-            val_loss_d_, _ = self.sess.run(D_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+            val_loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_D_losses.append(val_loss_d_)
 
             # update generator
-            val_loss_g_, _ = self.sess.run(G_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+            val_loss_g_, _ = self.sess.run([G_loss,G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_G_losses.append(val_loss_g_)
 
-            self.logger.log_images(mode='generated',images=test_images, num_images=len(test_images), epoch=num_epoch, n_batch=iter,
+            self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images), epoch=num_epoch,
+                                   n_batch=iter,
                                    num_batches=len(test_loader), normalize=True)
 
-            self.logger.log_images(mode='ground_truth', images=np.array(gt_image), num_images=len(gt_image), epoch=num_epoch, n_batch=iter,
-                              num_batches=len(test_loader), normalize=True)
+            self.logger.log_images(mode='ground_truth', images=np.array(gt_image), num_images=len(gt_image),
+                                   epoch=num_epoch, n_batch=iter,
+                                   num_batches=len(test_loader), normalize=True)
 
         mse_avg_total /= num_iter
         psnr_avg_total /= num_iter
         Disc_accuracy_total /= num_iter
 
-        rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]"%(num_epoch,mse_avg_total,psnr_avg_total))
-        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
+        rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]  Disc_Acc = [%.4f] loss_d= [%.3f], loss_g= [%.3f]" % (
+        num_epoch, mse_avg_total, psnr_avg_total, np.mean(val_D_losses), np.mean(val_G_losses), Disc_accuracy_total))
+        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, disc_acc=Disc_accuracy_total, epoch=num_epoch)
 
-        rootLogger.info("Epoch %d  loss_d= [%.3f], loss_g= [%.3f]"%(num_epoch, np.mean(val_D_losses), np.mean(val_G_losses)))
-        self.logger.log(d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch , n_batch=0,
+        self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch, n_batch=0,
                         num_batches=1)
-
-        rootLogger.info("Epoch %d  Disc_Acc = [%.4f] "%(num_epoch, Disc_accuracy_total))
-        self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
-        #self.logger.log_scores(disc_acc=Disc_accuracy_total,epoch=num_epoch)
-
+        # self.logger.log_scores(disc_acc=Disc_accuracy_total,epoch=num_epoch)
 
     # def get_noise(batch_size, n_noise):
     #     return np.random.normal(size=(batch_size, n_noise))

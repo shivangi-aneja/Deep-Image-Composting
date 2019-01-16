@@ -26,7 +26,7 @@ class Logger:
         # TensorBoard
         self.writer = SummaryWriter(log_dir=log_path, comment=self.comment)
 
-    def log(self, d_error, g_error, epoch, n_batch, num_batches):
+    def log(self, mode, d_error, g_error, epoch, n_batch, num_batches):
 
         # var_class = torch.autograd.variable.Variable
         if isinstance(d_error, torch.autograd.Variable):
@@ -36,24 +36,27 @@ class Logger:
 
         step = Logger._step(epoch, n_batch, num_batches)
         self.writer.add_scalar(
-            '{}/D_error'.format(self.comment), d_error, step)
+            '{}/D_error'.format(mode + '_' +self.comment), d_error, step)
         self.writer.add_scalar(
-            '{}/G_error'.format(self.comment), g_error, step)
+            '{}/G_error'.format(mode + '_' +self.comment), g_error, step)
 
-
-    def log_scores(self, mse, psnr, epoch):
+    def log_scores(self, mse, psnr, disc_acc, epoch):
 
         # var_class = torch.autograd.variable.Variable
         if isinstance(mse, torch.autograd.Variable):
             mse = mse.data.cpu().numpy()
         if isinstance(psnr, torch.autograd.Variable):
             psnr = psnr.data.cpu().numpy()
+        if isinstance(disc_acc, torch.autograd.Variable):
+            disc_acc = disc_acc.data.cpu().numpy()
 
         step = Logger._step(epoch, n_batch=0, num_batches=1)
         self.writer.add_scalar(
             '{}/mse'.format(self.comment), mse, step)
         self.writer.add_scalar(
             '{}/psnr'.format(self.comment), psnr, step)
+        self.writer.add_scalar(
+            '{}/disc_accuracy'.format(self.comment), disc_acc, step)
 
 
     def log_images(self, mode, images, num_images, epoch, n_batch, num_batches, normalize=True):

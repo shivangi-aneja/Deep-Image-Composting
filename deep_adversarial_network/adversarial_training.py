@@ -261,11 +261,11 @@ class DeepGAN(object):
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy
 
-            val_loss_d_, _ = self.sess.run(D_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+            val_loss_d_, _ = self.sess.run(D_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_D_losses.append(val_loss_d_)
 
             # update generator
-            val_loss_g_, _ = self.sess.run(G_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+            val_loss_g_, _ = self.sess.run(G_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_G_losses.append(val_loss_g_)
 
             self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images), epoch=num_epoch,

@@ -25,7 +25,7 @@ def calc_mse_psnr(img_list1, img_list2):
     total_psnr = 0.
 
     for i in range(num_imgs):
-        im1 = img_list1[i].numpy()
+        im1 = img_list1[i]
         im2 = img_list2[i].numpy()
         mse_val = calc_mse(im1,im2)
         if mse_val == 0.:

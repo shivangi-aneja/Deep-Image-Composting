@@ -45,8 +45,8 @@ def calc_mse_psnr(img_list1, img_list2):
 def d_accuracy(real_prob, fake_prob):
     label_real = np.ones(shape = real_prob.shape[0])
     label_fake = np.zeros(shape = fake_prob.shape[0])
-    real_pred = round(real_prob)
-    fake_pred = round(fake_prob)
+    real_pred = np.round(real_prob)
+    fake_pred = np.round(fake_prob)
     acc_real = (label_real == real_pred).mean()
     acc_fake = (label_fake == fake_pred).mean()
     return np.mean([acc_real, acc_fake])

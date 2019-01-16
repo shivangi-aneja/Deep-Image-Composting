@@ -268,6 +268,10 @@ class DeepGAN(object):
             val_loss_g_, _ = self.sess.run([G_loss,G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_G_losses.append(val_loss_g_)
 
+            self.logger.log_images(mode='composite', images=np.array(comp_image), num_images=len(comp_image),
+                                   epoch=num_epoch, n_batch=iter,
+                                   num_batches=len(test_loader), normalize=True)
+
             self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images), epoch=num_epoch,
                                    n_batch=iter,
                                    num_batches=len(test_loader), normalize=True)
@@ -286,7 +290,3 @@ class DeepGAN(object):
 
         self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch, n_batch=0,
                         num_batches=1)
-        # self.logger.log_scores(disc_acc=Disc_accuracy_total,epoch=num_epoch)
-
-    # def get_noise(batch_size, n_noise):
-    #     return np.random.normal(size=(batch_size, n_noise))

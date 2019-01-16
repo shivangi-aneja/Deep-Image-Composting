@@ -4,7 +4,7 @@
 
 from deep_adversarial_network.discriminator.test_discriminator import *
 
-DISCRIMINATORS = {"test_discriminator1"}
+DISCRIMINATORS = {"test_discriminator1", "resnet"}
 
 def get_available_discriminators():
     """
@@ -27,3 +27,6 @@ def make_discriminator(name, *args, **kwargs):
 
     elif name == "test_discriminator1":
         return test_Discriminator1()
+
+    elif name == "resnet":
+        return Resnet_Discriminator()

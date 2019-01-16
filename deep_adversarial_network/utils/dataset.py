@@ -25,8 +25,6 @@ def make_dataset(name):
     name = name.strip().lower()
     if not name in DATASETS:
         raise ValueError("invalid dataset: '{0}'".format(name))
-    elif name == 'mnist':
-        return MNIST()
     elif name == 'toy':
         return  TOY_DATA()
     elif name == 'big':
@@ -56,28 +54,6 @@ class BaseDataset(object):
     def n_classes(self):
         """Get number of classes."""
         raise NotImplementedError('`n_classes` is not implemented')
-
-class MNIST(BaseDataset):
-    """
-    MNIST dataset
-    """
-    def __init__(self):
-        super(BaseDataset, self).__init__()
-
-
-    def _load(self, dirpath):
-        # Normalized images
-        trans = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
-        train_mask = range(55000)
-        val_mask = range(55000, 60000)
-        train_val = datasets.MNIST(root=dirpath, train=True, download=True, transform=trans)
-        train = Subset(train_val, train_mask)
-        val = Subset(train_val, val_mask)
-        test = datasets.MNIST(root=dirpath, train=False, download=True, transform=trans)
-        return train, val, test
-
-    def n_classes(self):
-        return 10
 
 class TOY_DATA(BaseDataset):
     """
@@ -119,13 +95,8 @@ class BIG_DATA(BaseDataset):
         train_tuple = np.load(dirpath + '/train.npy')
         val_tuple = np.load(dirpath + '/val.npy')
 
-        train_data = torch.stack([torch.Tensor(i) for i in train_tuple[0:1000]])
-        val_data = torch.stack([torch.Tensor(i) for i in val_tuple[0:5]])
-
-        # train = CustomDataset1(comp_image=train_data[:,0,:,:], fg_img=train_data[:,1,:,:],
-        #                       alpha=train_data[:,2,:,:], bg_img=train_data[:,3,:,:])
-        # val = CustomDataset1(comp_image=val_data[:, 0, :, :], fg_img=val_data[:, 1, :, :],
-        #                       alpha=val_data[:, 2, :, :], bg_img=val_data[:, 3, :, :])
+        train_data = torch.stack([torch.Tensor(i) for i in train_tuple[0:2000]])
+        val_data = torch.stack([torch.Tensor(i) for i in val_tuple[0:500]])
 
         train = CustomDataset2(comp_image=train_data[:, 0, :, :], gt_img=train_data[:, 1, :, :])
         val = CustomDataset2(comp_image=val_data[:, 0, :, :], gt_img=val_data[:, 1, :, :])

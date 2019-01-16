@@ -51,7 +51,7 @@ parser.add_argument('-rs', '--random-seed', type=int, default=1,
                     help="random seed for training")
 
 # GAN-related
-parser.add_argument('-dr', '--discriminator', type=str, default='test_discriminator1',
+parser.add_argument('-dr', '--discriminator', type=str, default='resnet',
                     help="discriminator architecture name, {'" + \
                          "', '".join(get_available_discriminators()) +\
                          "'}")

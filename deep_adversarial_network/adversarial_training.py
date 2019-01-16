@@ -158,7 +158,7 @@ class DeepGAN(object):
             # Evaluate the model after every epoch
             self.evaluate_test_data(num_epoch=(epoch + 1), test_loader=test_loader, G_z=G_z, D_fake=D_fake,
                                     D_fake_logits=D_fake_logits, D_real=D_real, D_real_logits=D_real_logits,
-                                    D_loss=D_loss, G_loss=G_loss, comp_img=comp_img, gt_img=gt_img,
+                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, comp_img=comp_img, gt_img=gt_img,
                                     isTrain=isTrain, show=False, save=True, path=fixed_p)
 
             # Save the model after every 10 epochs
@@ -224,7 +224,7 @@ class DeepGAN(object):
             plt.close()
 
     def evaluate_test_data(self, test_loader, num_epoch, G_z, D_fake, D_fake_logits, D_real, D_real_logits,
-                           D_loss, G_loss, comp_img, gt_img, isTrain, show=False, save=False,
+                           D_loss, G_loss, D_optim, comp_img, gt_img, isTrain, show=False, save=False,
                            path='result', tf_log_path=None):
         """
         Function to evaluate the result on test data
@@ -261,7 +261,7 @@ class DeepGAN(object):
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy
 
-            val_loss_d_, _ = self.sess.run(D_loss, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
+            val_loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_D_losses.append(val_loss_d_)
 
             # update generator

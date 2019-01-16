@@ -176,7 +176,7 @@ class DeepGAN(object):
         end_time = time.time()
         total_ptime = end_time - start_time
         train_hist['total_ptime'].append(total_ptime)
-        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (git np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
         rootLogger.info("Training finish!!!...")
 
         if self.mplib:

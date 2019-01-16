@@ -49,6 +49,6 @@ def d_accuracy(real_prob, fake_prob):
     fake_pred = tf.round(fake_prob)
     acc_real = tf.metrics.accuracy(label_real, real_pred)
     acc_fake = tf.metrics.accuracy(label_fake, fake_pred)
-    return tf.metrics.reduce_mean([acc_real, acc_fake])
+    return tf.reduce_mean([acc_real, acc_fake])
 
 

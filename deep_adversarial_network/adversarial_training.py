@@ -285,7 +285,7 @@ class DeepGAN(object):
         Disc_accuracy_total /= num_iter
 
         rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]  Disc_Acc = [%.4f] loss_d= [%.3f], loss_g= [%.3f]" % (
-        num_epoch, mse_avg_total, psnr_avg_total, np.mean(val_D_losses), np.mean(val_G_losses), Disc_accuracy_total))
+        num_epoch, mse_avg_total, psnr_avg_total, Disc_accuracy_total, np.mean(val_D_losses), np.mean(val_G_losses)))
         self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, disc_acc=Disc_accuracy_total, epoch=num_epoch)
 
         self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch, n_batch=0,

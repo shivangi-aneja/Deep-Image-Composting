@@ -176,7 +176,7 @@ class DeepGAN(object):
         end_time = time.time()
         total_ptime = end_time - start_time
         train_hist['total_ptime'].append(total_ptime)
-        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (git np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
         rootLogger.info("Training finish!!!...")
 
         if self.mplib:
@@ -279,7 +279,7 @@ class DeepGAN(object):
         self.logger.log_scores(mse=mse_avg_total, psnr=psnr_avg_total, epoch=num_epoch)
 
         rootLogger.info("Epoch %d  loss_d= [%.3f], loss_g= [%.3f]"%(num_epoch, np.mean(val_D_losses), np.mean(val_G_losses)))
-        self.logger.log(d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=epoch + 1, n_batch=0,
+        self.logger.log(d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch , n_batch=0,
                         num_batches=1)
 
         rootLogger.info("Epoch %d  Disc_Acc = [%.4f] "%(num_epoch, Disc_accuracy_total))

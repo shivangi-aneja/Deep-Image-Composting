@@ -139,7 +139,11 @@ def main(args=args):
 
     batch_size = args.batch_size
     mplib = True if args.plot_matplotlib=='y' else False
-    recon_loss = args.recon_loss
+
+
+    recon_loss = LOSSES.get(args.recon_loss, None)
+    if not recon_loss:
+        raise ValueError("invalid loss: '{0}'".format(args.recon_loss))
 
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,

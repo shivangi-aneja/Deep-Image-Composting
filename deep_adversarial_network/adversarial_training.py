@@ -14,7 +14,7 @@ from deep_adversarial_network.utils.common_util import *
 
 class DeepGAN(object):
 
-    def __init__(self, discriminator, generator, model_name, dataset, batch_size,
+    def __init__(self, discriminator, generator, model_name, recon_loss, dataset, batch_size,
                  d_optim=None, g_optim=None, d_lr=1e-4, g_lr=1e-4, mplib=False, epochs=10, tf_log_path=None):
         """
         Initialize all the parameters
@@ -38,6 +38,7 @@ class DeepGAN(object):
         self.d_lr = d_lr
         self.g_lr = g_lr
         self.epochs = epochs
+        self.recon_loss = recon_loss
         self.model_name = model_name
         self.dataset = dataset
         self.batch_size = batch_size
@@ -77,9 +78,8 @@ class DeepGAN(object):
         D_loss_fake = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
         D_loss = D_loss_real + D_loss_fake
-        # D_loss = -tf.reduce_mean(tf.log(D_real) - tf.log(D_fake))
-        # G_loss = -tf.reduce_mean(tf.log(D_fake))
-        G_loss1 = tf.reduce_mean(tf.losses.mean_squared_error(gt_img, G_z))
+
+        G_loss1 = tf.reduce_mean(self.recon_loss(gt_img, G_z))
         G_loss2 = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
         G_loss = G_loss2 + 0.1 * G_loss1

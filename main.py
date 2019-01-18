@@ -24,6 +24,12 @@ OPTIMIZERS = {
     'rms_prop': tf.train.RMSPropOptimizer
 }
 
+# Optimizers
+LOSSES = {
+    'l1': tf.losses.mean_squared_error,
+    'l2': tf.losses.absolute_difference
+}
+
 LOG_PATH = os.path.join(os.getcwd(), 'logs/')
 PLOT_PATH = os.path.join(os.getcwd(), 'plots/')
 MODEL_PATH = os.path.join(os.getcwd(), 'models/')
@@ -82,8 +88,15 @@ parser.add_argument('-g_opt', '--g_optim', type=str, default='adam',
 parser.add_argument('-m', '--model_name', type=str,
                     default='gan_model', help='name for model')
 
-parser.add_argument('-e', '--epochs', type=int, default=5,
+parser.add_argument('-e', '--epochs', type=int, default=1000,
                     help='number of epochs')
+
+parser.add_argument('-rl', '--recon_loss', type=str, default='l2',
+                    help="losses, {'" + \
+                         "', '".join(LOSSES.keys()) +\
+                         "'}")
+
+
 
 # Plot related
 parser.add_argument('-tf', '--tf_logs', type=str, default='tf_logs',
@@ -126,6 +139,7 @@ def main(args=args):
 
     batch_size = args.batch_size
     mplib = True if args.plot_matplotlib=='y' else False
+    recon_loss = args.recon_loss
 
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,
@@ -158,7 +172,7 @@ def main(args=args):
     g_lr = args.g_lr
 
     # Create GAN according to params
-    model = DeepGAN(discriminator=discriminator, generator=generator, model_name=args.model_name,
+    model = DeepGAN(discriminator=discriminator, generator=generator, model_name=args.model_name, recon_loss=recon_loss,
                     dataset=args.dataset, batch_size=args.batch_size, d_optim=d_optim, g_optim=g_optim, d_lr=d_lr, g_lr=g_lr,
                     epochs=args.epochs, mplib=mplib, tf_log_path=tf_log_path)
     # Train the model

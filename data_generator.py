@@ -147,20 +147,68 @@ def create_composite_img(comp_img_path, fg_img_path,fg_mask_path, bg_path, comp_
     # np.save(os.path.join(comp_file_path + name_mask), composite_img_tuple)
 
 
+def create_composite_img_new(comp_img_path,mask_path, gt_img_path, data_path, comp_file_path, file_name):
+
+    composite_img_tuple = []
+    ctr = 0
+    for fg_img in sorted(os.listdir(comp_img_path)):
+
+        try:
+            if fg_img.endswith(".png") and fg_img is not None :
+                # Load image, mask and background
+                foreground = cv2.imread(comp_img_path+fg_img)
+                alpha = cv2.imread(mask_path+fg_img.split("_style")[0]+".png")
+                background = cv2.imread(gt_img_path+fg_img.split("_style")[0]+".png")
+
+                # Convert uint8 to float
+                fg = foreground.astype(float)
+                bg = background.astype(float)
+
+                # Normalize the alpha mask to keep intensity between 0 and 1
+                alpha = alpha.astype(float) / 255
+
+                # Multiply the foreground with the alpha matte
+                foreground = cv2.multiply(alpha, fg)
+
+                # Multiply the background with ( 1 - alpha )
+                background = cv2.multiply(1.0 - alpha, bg)
+
+                # Add the masked foreground and background.
+                out_image = cv2.add(foreground, background)
+
+                # Display image
+                cv2.imwrite(data_path+str(ctr)+'_cp.png', out_image)
+                cv2.imwrite(data_path+str(ctr)+'_gt.png', bg)
+                composite_img_tuple.append((out_image, bg))
+                ctr += 1
+                print(ctr)
+        except:
+            print(comp_img_path+fg_img)
+            print(mask_path+fg_img)
+            #print(gt_img_path+bg_img)
+
+    np.save(os.path.join(comp_file_path + file_name), composite_img_tuple)
+
+
 
 
 
 def main():
 
-    input_dir1 = os.path.join(os.getcwd(), 'data/big_data/background/')
-    input_dir2 = os.path.join(os.getcwd(), 'data/big_data/foreground/gt/')
-    input_dir3 = os.path.join(os.getcwd(), 'data/big_data/foreground/img/')
-    input_dir4 = os.path.join(os.getcwd(), 'data/big_data/composite/')
-    input_dir5 = os.path.join(os.getcwd(), 'data/big_data/blended/')
+    gt_dir = os.path.join(os.getcwd(), 'data/big_data/ground_truth/')
+    mask_dir = os.path.join(os.getcwd(), 'data/big_data/mask/')
+
+    train_dir_data = os.path.join(os.getcwd(), 'data/big_data/train/data/')
+    train_dir_comp = os.path.join(os.getcwd(), 'data/big_data/train/composite/')
+
+    val_dir_data = os.path.join(os.getcwd(), 'data/big_data/val/data/')
+    val_dir_comp = os.path.join(os.getcwd(), 'data/big_data/val/composite/')
+
+
     path = os.path.join(os.getcwd(), 'data/big_data/')
 
     # For renaming
-    # change_img_to_png(input_dir1)
+    # change_img_to_png(input_dir4)
     # change_img_to_png(input_dir2)
     # change_img_to_png(input_dir3)
     #
@@ -175,9 +223,14 @@ def main():
     # Save to numpy
     #save_to_numpy_array(fg_img_path=input_dir3, fg_mask_path=input_dir2, bg_path=input_dir1, path=path)
 
-    # Create Composite Images
-    create_composite_img(comp_img_path=input_dir4, fg_img_path=input_dir3, fg_mask_path=input_dir2,
-                         bg_path=input_dir1, comp_file_path=path)
+    # Create Composite Images Train
+    create_composite_img_new(comp_img_path=train_dir_comp, gt_img_path=gt_dir, mask_path=mask_dir, data_path=train_dir_data,
+                         comp_file_path=path, file_name="train.npy")
+
+    # Create Composite Images Val
+    create_composite_img_new(comp_img_path=val_dir_comp, gt_img_path=gt_dir, mask_path=mask_dir,
+                             data_path=val_dir_data,
+                             comp_file_path=path, file_name="val.npy")
 
 
 

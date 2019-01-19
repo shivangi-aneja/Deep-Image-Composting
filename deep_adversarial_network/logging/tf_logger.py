@@ -1,17 +1,15 @@
-import os
-import numpy as np
 import errno
-import torchvision.utils as vutils
-from tensorboardX import SummaryWriter
-from IPython import display
+import os
+
 import matplotlib
+import numpy as np
+import torchvision.utils as vutils
+from IPython import display
+from tensorboardX import SummaryWriter
+
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import torch
-
-'''
-    TensorBoard Data will be stored in './runs' path
-'''
 
 
 class Logger:
@@ -27,6 +25,16 @@ class Logger:
         self.writer = SummaryWriter(log_dir=log_path, comment=self.comment)
 
     def log(self, mode, d_error, g_error, epoch, n_batch, num_batches):
+        """
+        Log errors
+        :param mode: Train/Val
+        :param d_error: Discriminator Error
+        :param g_error: Generator Error
+        :param epoch: Epoch Number
+        :param n_batch: Batch Number
+        :param num_batches: Number Of Batches
+        :return: None
+        """
 
         # var_class = torch.autograd.variable.Variable
         if isinstance(d_error, torch.autograd.Variable):
@@ -36,11 +44,20 @@ class Logger:
 
         step = Logger._step(epoch, n_batch, num_batches)
         self.writer.add_scalar(
-            '{}/D_error'.format(mode + '_' +self.comment), d_error, step)
+            '{}/D_error'.format(mode + '_' + self.comment), d_error, step)
         self.writer.add_scalar(
-            '{}/G_error'.format(mode + '_' +self.comment), g_error, step)
+            '{}/G_error'.format(mode + '_' + self.comment), g_error, step)
 
     def log_scores(self, mode, mse, psnr, disc_acc, epoch):
+        """
+        Logs scores on Validation Data
+        :param mode: Train/Val
+        :param mse: Mean Squared Error
+        :param psnr: Peak Signal To Noise Ratio
+        :param disc_acc: Discriminator Accuracy
+        :param epoch: Epoch
+        :return: None
+        """
 
         # var_class = torch.autograd.variable.Variable
         if isinstance(mse, torch.autograd.Variable):
@@ -52,23 +69,30 @@ class Logger:
 
         step = Logger._step(epoch, n_batch=0, num_batches=1)
         self.writer.add_scalar(
-            '{}/mse'.format(mode+'_'+self.comment), mse, step)
+            '{}/mse'.format(mode + '_' + self.comment), mse, step)
         self.writer.add_scalar(
-            '{}/psnr'.format(mode+'_'+self.comment), psnr, step)
+            '{}/psnr'.format(mode + '_' + self.comment), psnr, step)
         self.writer.add_scalar(
-            '{}/disc_accuracy'.format(mode+'_'+self.comment), disc_acc, step)
-
+            '{}/disc_accuracy'.format(mode + '_' + self.comment), disc_acc, step)
 
     def log_images(self, mode, images, num_images, epoch, n_batch, num_batches, normalize=True):
-        '''
-        input images are expected in format (NCHW)
-        '''
+        """
+        Logs Images (input images are expected in format (NCHW))
+        :param mode: Train/Val
+        :param images: Images
+        :param num_images: Number Of Images
+        :param epoch: Epoch
+        :param n_batch: Batch Number
+        :param num_batches: Number Of Batches
+        :param normalize: Normalize the image or not
+        :return: None
+        """
         if type(images) == np.ndarray:
             images = torch.from_numpy(images)
             images = images.transpose(1, 3)
 
         step = Logger._step(epoch, n_batch, num_batches)
-        img_name = '{}/images{}'.format(mode+'_'+self.comment, '',step)
+        img_name = '{}/images{}'.format(mode + '_' + self.comment, '', step)
 
         # Make horizontal grid from image tensor
         horizontal_grid = vutils.make_grid(
@@ -78,12 +102,12 @@ class Logger:
         # grid = vutils.make_grid(
         #     images, nrow=nrows, normalize=True, scale_each=True)
 
-        #print(type(horizontal_grid))
+        # print(type(horizontal_grid))
         # Add horizontal images to tensorboard
         self.writer.add_image(img_name, horizontal_grid, step)
 
         # Save plots
-        #self.save_torch_images(horizontal_grid, grid, epoch, n_batch)
+        # self.save_torch_images(horizontal_grid, grid, epoch, n_batch)
 
     def save_torch_images(self, horizontal_grid, grid, epoch, n_batch, plot_horizontal=True):
         out_dir = './data/images/{}'.format(self.data_subdir)

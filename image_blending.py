@@ -1,16 +1,18 @@
-import sys
-import os
-import numpy as np
-import cv2
-import scipy
-from scipy.stats import norm
-from scipy.signal import convolve2d
 import math
+import os
 
-'''split rgb image to its channels'''
+import cv2
+import numpy as np
+import scipy
+from scipy.signal import convolve2d
 
 
 def split_rgb(image):
+    """
+    split rgb image to its channels
+    :param image: Image
+    :return: R,G,B channels of image
+    """
     red = None
     green = None
     blue = None
@@ -18,18 +20,22 @@ def split_rgb(image):
     return red, green, blue
 
 
-'''generate a 5x5 kernel'''
-
-
 def generating_kernel(a):
+    """
+    generate a 5x5 kernel
+    :param a:
+    :return:
+    """
     w_1d = np.array([0.25 - a / 2.0, 0.25, a, 0.25, 0.25 - a / 2.0])
     return np.outer(w_1d, w_1d)
 
 
-'''reduce image by 1/2'''
-
-
 def ireduce(image):
+    """
+    reduce image by 1/2
+    :param image:
+    :return:
+    """
     out = None
     kernel = generating_kernel(0.4)
     outimage = scipy.signal.convolve2d(image, kernel, 'same')
@@ -37,10 +43,12 @@ def ireduce(image):
     return out
 
 
-'''expand image by factor of 2'''
-
-
 def iexpand(image):
+    """
+    expand image by factor of 2
+    :param image:
+    :return:
+    """
     out = None
     kernel = generating_kernel(0.4)
     outimage = np.zeros((image.shape[0] * 2, image.shape[1] * 2), dtype=np.float64)
@@ -49,10 +57,13 @@ def iexpand(image):
     return out
 
 
-'''create a gaussain pyramid of a given image'''
-
-
 def gauss_pyramid(image, levels):
+    """
+    create a gaussain pyramid of a given image
+    :param image:
+    :param levels:
+    :return:
+    """
     output = []
     output.append(image)
     tmp = image
@@ -62,10 +73,12 @@ def gauss_pyramid(image, levels):
     return output
 
 
-'''build a laplacian pyramid'''
-
-
 def lapl_pyramid(gauss_pyr):
+    """
+    build a laplacian pyramid
+    :param gauss_pyr:
+    :return:
+    """
     output = []
     k = len(gauss_pyr)
     for i in range(0, k - 1):
@@ -80,10 +93,14 @@ def lapl_pyramid(gauss_pyr):
     return output
 
 
-'''Blend the two laplacian pyramids by weighting them according to the mask.'''
-
-
 def blend(lapl_pyr_white, lapl_pyr_black, gauss_pyr_mask):
+    """
+    Blend the two laplacian pyramids by weighting them according to the mask.
+    :param lapl_pyr_white:
+    :param lapl_pyr_black:
+    :param gauss_pyr_mask:
+    :return:
+    """
     blended_pyr = []
     k = len(gauss_pyr_mask)
     for i in range(0, k):
@@ -93,10 +110,12 @@ def blend(lapl_pyr_white, lapl_pyr_black, gauss_pyr_mask):
     return blended_pyr
 
 
-'''Reconstruct the image based on its laplacian pyramid.'''
-
-
 def collapse(lapl_pyr):
+    """
+    Reconstruct the image based on its laplacian pyramid.
+    :param lapl_pyr:
+    :return:
+    """
     output = None
     output = np.zeros((lapl_pyr[0].shape[0], lapl_pyr[0].shape[1]), dtype=np.float64)
     for i in range(len(lapl_pyr) - 1, 0, -1):
@@ -115,14 +134,17 @@ def collapse(lapl_pyr):
 
 
 def main():
-
+    """
+    Applies Laplacian Pyramid to Images
+    :return:
+    """
     img_path = 'data_orig/toy_data/deepharmonize/'
 
     for img in sorted(os.listdir(img_path)):
         if img.find('_') == -1:
-            image1 = cv2.imread(img_path+img.split(".")[0]+"_bg.png")
-            image2 = cv2.imread(img_path+img)
-            mask = cv2.imread(img_path+img.split(".")[0]+"_mask.png")
+            image1 = cv2.imread(img_path + img.split(".")[0] + "_bg.png")
+            image2 = cv2.imread(img_path + img)
+            mask = cv2.imread(img_path + img.split(".")[0] + "_mask.png")
             r1 = None
             g1 = None
             b1 = None
@@ -199,7 +221,7 @@ def main():
             tmp.append(outimgg)
             tmp.append(outimgr)
             result = cv2.merge(tmp, result)
-            cv2.imwrite('data_orig/toy_data/blended/'+img.split(".")[0]+'_blended.png', result)
+            cv2.imwrite('data_orig/toy_data/blended/' + img.split(".")[0] + '_blended.png', result)
 
 
 if __name__ == '__main__':

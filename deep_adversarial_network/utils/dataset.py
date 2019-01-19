@@ -2,11 +2,12 @@
     dataset class for all the datasets
 """
 import os
-import torch
+
 import numpy as np
-from torchvision import datasets, transforms
-from deep_adversarial_network.utils.custom_dataloader import CustomDataset1,CustomDataset2
-from torch.utils.data.dataset import (Subset)
+import torch
+
+from deep_adversarial_network.utils.custom_dataloader import CustomDataset2
+
 
 def get_available_datasets():
     """
@@ -26,16 +27,16 @@ def make_dataset(name):
     if not name in DATASETS:
         raise ValueError("invalid dataset: '{0}'".format(name))
     elif name == 'toy':
-        return  TOY_DATA()
+        return TOY_DATA()
     elif name == 'big':
-        return  BIG_DATA()
-
+        return BIG_DATA()
 
 
 class BaseDataset(object):
     """
     base dataset
     """
+
     def _load(self, dirpath):
         """Download if needed and return the dataset.
         Return format is (`torch.Tensor` data, `torch.Tensor` label) iterable
@@ -55,10 +56,12 @@ class BaseDataset(object):
         """Get number of classes."""
         raise NotImplementedError('`n_classes` is not implemented')
 
+
 class TOY_DATA(BaseDataset):
     """
     TOY_DATA dataset
     """
+
     def __init__(self):
         super(BaseDataset, self).__init__()
 
@@ -87,6 +90,7 @@ class BIG_DATA(BaseDataset):
     """
     BIG_DATA dataset
     """
+
     def __init__(self):
         super(BaseDataset, self).__init__()
 
@@ -108,6 +112,3 @@ class BIG_DATA(BaseDataset):
 
 
 DATASETS = {"mnist", "toy", "big"}
-
-
-

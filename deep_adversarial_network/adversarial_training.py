@@ -3,7 +3,6 @@ import pickle
 import time
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 from deep_adversarial_network.logging.logger import rootLogger
 from deep_adversarial_network.logging.tf_logger import Logger
@@ -22,6 +21,7 @@ class DeepGAN(object):
         :param generator: generator model
         :param model_name: model name
         :param dataset: dataset
+        :param recon_loss: Reconstruction Loss
         :param batch_size: batch size
         :param d_optim: Optimizer for discriminator
         :param g_optim: Optimizer for generator
@@ -53,7 +53,7 @@ class DeepGAN(object):
         :param train_loader: Loader for training data
         :param test_loader: Loader for test data
         :param model_path: Path for saving the data
-        :return:
+        :return: None
         """
 
         # Name to store the GAN model
@@ -146,7 +146,8 @@ class DeepGAN(object):
                 G_losses.append(loss_g_)
 
             # Log the training losses
-            self.logger.log(mode="train", d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch + 1, n_batch=0,
+            self.logger.log(mode="train", d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch + 1,
+                            n_batch=0,
                             num_batches=1)
 
             epoch_end_time = time.time()
@@ -158,7 +159,8 @@ class DeepGAN(object):
             # Evaluate the model after every epoch
             self.evaluate_test_data(num_epoch=(epoch + 1), test_loader=test_loader, G_z=G_z, D_fake=D_fake,
                                     D_fake_logits=D_fake_logits, D_real=D_real, D_real_logits=D_real_logits,
-                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img, gt_img=gt_img,
+                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img,
+                                    gt_img=gt_img,
                                     isTrain=isTrain, show=False, save=True, path=fixed_p)
 
             # Save the model after every 10 epochs
@@ -178,9 +180,10 @@ class DeepGAN(object):
         total_ptime = end_time - start_time
         train_hist['total_ptime'].append(total_ptime)
         rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (
-        np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+            np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
 
-        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (
+        np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
         rootLogger.info("Training finish!!!...")
 
         if self.mplib:
@@ -265,7 +268,7 @@ class DeepGAN(object):
             val_D_losses.append(val_loss_d_)
 
             # update generator
-            val_loss_g_, _ = self.sess.run([G_loss,G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
+            val_loss_g_, _ = self.sess.run([G_loss, G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_G_losses.append(val_loss_g_)
 
             self.logger.log_images(mode='composite', images=np.array(comp_image), num_images=len(comp_image),
@@ -285,8 +288,11 @@ class DeepGAN(object):
         Disc_accuracy_total /= num_iter
 
         rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]  Disc_Acc = [%.4f] loss_d= [%.3f], loss_g= [%.3f]" % (
-        num_epoch, mse_avg_total, psnr_avg_total, Disc_accuracy_total, np.mean(val_D_losses), np.mean(val_G_losses)))
-        self.logger.log_scores(mode="val",mse=mse_avg_total, psnr=psnr_avg_total, disc_acc=Disc_accuracy_total, epoch=num_epoch)
+            num_epoch, mse_avg_total, psnr_avg_total, Disc_accuracy_total, np.mean(val_D_losses),
+            np.mean(val_G_losses)))
+        self.logger.log_scores(mode="val", mse=mse_avg_total, psnr=psnr_avg_total, disc_acc=Disc_accuracy_total,
+                               epoch=num_epoch)
 
-        self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch, n_batch=0,
+        self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch,
+                        n_batch=0,
                         num_batches=1)

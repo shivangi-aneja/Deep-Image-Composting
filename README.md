@@ -25,7 +25,7 @@ Also, installing with pip should work (the *virtualenv* executable should be add
 Execute
 `virtualenv -p python3 --no-site-packages venv`
 
-Basically, this installs a sandboxed Python in the directory `.venv`. The
+Basically, this installs a sandboxed Python in the directory `svenv`. The
 additional argument ensures that sandboxed packages are used even if they had
 already been installed globally before.
 

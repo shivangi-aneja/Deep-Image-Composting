@@ -8,12 +8,13 @@ class test_Discriminator1(object):
     """
     Big Image
     """
+
     def __init__(self):
         pass
 
-    def make_discriminator_network(self, x, reuse=False,isTrain=True):
+    def make_discriminator_network(self, x, reuse=False, isTrain=True):
         with tf.variable_scope("discriminator", reuse=reuse):
-            #input = tf.placeholder(tf.float32, (None, 16, 16, 3), name="input")
+            # input = tf.placeholder(tf.float32, (None, 16, 16, 3), name="input")
             conv1 = tf.layers.conv2d(inputs=x, filters=32, kernel_size=(3, 3), padding='same',
                                      activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv1_bn = tf.layers.batch_normalization(conv1)
@@ -36,16 +37,18 @@ class test_Discriminator1(object):
 
         return out, logits
 
+
 class test_Discriminator2(object):
     """
     working
     """
+
     def __init__(self):
         pass
 
-    def make_discriminator_network(self, x, reuse=False,isTrain=True):
+    def make_discriminator_network(self, x, reuse=False, isTrain=True):
         with tf.variable_scope("discriminator", reuse=reuse):
-            #input = tf.placeholder(tf.float32, (None, 16, 16, 3), name="input")
+            # input = tf.placeholder(tf.float32, (None, 16, 16, 3), name="input")
             conv1 = tf.layers.conv2d(inputs=x, filters=32, kernel_size=(3, 3), padding='same',
                                      activation=tf.nn.relu, kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv1_bn = tf.layers.batch_normalization(conv1)
@@ -73,17 +76,17 @@ class Resnet_Discriminator(object):
     """
     test_Discriminator1
     """
+
     def __init__(self):
         pass
 
     def make_discriminator_network(self, x, reuse=False, isTrain=True):
         with tf.variable_scope("discriminator", reuse=reuse):
-
             conv1 = tf.layers.conv2d(inputs=x, filters=64, kernel_size=(7, 7), padding='valid', strides=2,
                                      activation=None, kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv1_maxpool = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 
-            #Block1
+            # Block1
 
             resnet_conv1 = tf.layers.conv2d(inputs=conv1_maxpool, filters=64, kernel_size=(3, 3), strides=1,
                                             kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
@@ -99,7 +102,7 @@ class Resnet_Discriminator(object):
             resnet_conv2_bn += conv1_maxpool
             resnet_conv2_bn = tf.nn.relu(resnet_conv2_bn)
 
-            #Block2
+            # Block2
 
             resnet2_conv1 = tf.layers.conv2d(inputs=resnet_conv2_bn, filters=64, kernel_size=(3, 3), strides=1,
                                              kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
@@ -122,4 +125,3 @@ class Resnet_Discriminator(object):
             out = tf.nn.sigmoid(logits)
 
         return out, logits
-

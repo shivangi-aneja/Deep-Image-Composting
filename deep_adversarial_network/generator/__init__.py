@@ -6,12 +6,14 @@ from deep_adversarial_network.generator.test_generator import *
 
 GENERATORS = {"test_generator1", "resnet"}
 
+
 def get_available_generators():
     """
     lists all the available discriminators
     :return: None
     """
     return sorted(GENERATORS)
+
 
 def make_generator(name, *args, **kwargs):
     """

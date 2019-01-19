@@ -5,6 +5,12 @@ import tensorflow as tf
 PIXEL_MAX = 255.0
 
 def calc_mse(imageA, imageB):
+    """
+    Calculates Mean Squared Error
+    :param imageA: First Image
+    :param imageB: Second Image
+    :return: MSE
+    """
     # the 'Mean Squared Error' between the two images is the
     # sum of the squared difference between the two images;
     # NOTE: the two images must have the same dimension
@@ -18,6 +24,12 @@ def calc_mse(imageA, imageB):
 
 
 def calc_mse_psnr(img_list1, img_list2):
+    """
+    Calculate MSE and PSNR for a set of Images
+    :param img_list1: Image List1
+    :param img_list2: Image List2
+    :return: MSE, PSNR
+    """
 
     num_imgs = img_list1.shape[0]
 
@@ -43,6 +55,12 @@ def calc_mse_psnr(img_list1, img_list2):
 
 
 def d_accuracy(real_prob, fake_prob):
+    """
+    Calculate Discriminator Accuracy
+    :param real_prob: Probability for Real Image
+    :param fake_prob: Probability for Fake Image
+    :return: Discriminator Accuracy
+    """
     label_real = np.ones(shape = real_prob.shape[0])
     label_fake = np.zeros(shape = fake_prob.shape[0])
     real_pred = np.round(real_prob)

@@ -31,6 +31,7 @@ class RNG(np.random.RandomState):
     >>> rng.rand()
     0.1586839721544656
     """
+
     def __init__(self, seed=None):
         self._seed = seed
         super(RNG, self).__init__(self._seed)

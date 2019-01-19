@@ -6,12 +6,14 @@ from deep_adversarial_network.discriminator.test_discriminator import *
 
 DISCRIMINATORS = {"test_discriminator1", "resnet"}
 
+
 def get_available_discriminators():
     """
     lists all the available discriminators
     :return: None
     """
     return sorted(DISCRIMINATORS)
+
 
 def make_discriminator(name, *args, **kwargs):
     """

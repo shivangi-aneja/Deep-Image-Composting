@@ -10,6 +10,7 @@ class DatasetIndexer(object):
     ----------
     dataset : `torch.utils.data.Dataset`
     """
+
     def __init__(self, dataset, ind):
         self.dataset = dataset
         self.ind = np.asarray(ind)

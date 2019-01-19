@@ -4,7 +4,6 @@ class file for logging
 import logging
 from datetime import datetime
 
-
 # Logging utilities - logs get saved in folder logs named by date and time, and also output
 # at standard output
 

@@ -14,7 +14,7 @@ def change_img_to_png(input_path):
             os.rename(input_path + "/" + image, input_path + "/" + image.split(".")[0] + '.png')
 
 
-# Resize images to be of size 400*320
+# Resize images to be of size 400*300
 def resize_images(input_path):
 
     new_size = (400,300)
@@ -25,9 +25,6 @@ def resize_images(input_path):
             new_image = cv2.cvtColor(new_image, cv2.IMREAD_COLOR)
             #cv2.waitKey(0)
             cv2.imwrite(input_path+image.split(".")[0]+'.png',new_image)
-            # im = Image.open(input_path+image)
-            # im.thumbnail(new_size)
-            # im.save(input_path+image.split(".")[0]+".png")
 
 def save_to_numpy_array(fg_img_path,fg_mask_path,bg_path,path):
 
@@ -213,11 +210,10 @@ def main():
     # change_img_to_png(input_dir3)
     #
     # # For resizing
-    # resize_images(input_path = input_dir1)
-    # resize_images(input_path = input_dir2)
-    # resize_images(input_path = input_dir3)
-    # resize_images(input_path = input_dir4)
-    # resize_images(input_path = input_dir5)
+    resize_images(input_path = gt_dir)
+    resize_images(input_path = mask_dir)
+    resize_images(input_path = train_dir_comp)
+    resize_images(input_path = val_dir_comp)
 
     #save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='big_data')
     # Save to numpy

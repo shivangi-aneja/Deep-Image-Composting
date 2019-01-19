@@ -174,6 +174,8 @@ def create_composite_img_new(comp_img_path,mask_path, gt_img_path, data_path, co
                 out_image = cv2.add(foreground, background)
 
                 # Display image
+                out_image = cv2.normalize(out_image, np.zeros((400, 300)), 0, 255, cv2.NORM_MINMAX)
+                bg = cv2.normalize(bg, np.zeros((400, 300)), 0, 255, cv2.NORM_MINMAX)
                 cv2.imwrite(data_path+str(ctr)+'_cp.png', out_image)
                 cv2.imwrite(data_path+str(ctr)+'_gt.png', bg)
                 composite_img_tuple.append((out_image, bg))
@@ -210,10 +212,10 @@ def main():
     # change_img_to_png(input_dir3)
     #
     # # For resizing
-    resize_images(input_path = gt_dir)
-    resize_images(input_path = mask_dir)
-    resize_images(input_path = train_dir_comp)
-    resize_images(input_path = val_dir_comp)
+    # resize_images(input_path = gt_dir)
+    # resize_images(input_path = mask_dir)
+    # resize_images(input_path = train_dir_comp)
+    # resize_images(input_path = val_dir_comp)
 
     #save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='big_data')
     # Save to numpy

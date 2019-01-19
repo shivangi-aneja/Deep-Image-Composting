@@ -179,7 +179,7 @@ def create_composite_img_new(comp_img_path,mask_path, gt_img_path, data_path, co
                 #bg = cv2.normalize(bg, np.zeros((400, 300)), 0, 255, cv2.NORM_MINMAX)
                 cv2.imwrite(data_path+str(ctr)+'_cp.png', out_image)
                 cv2.imwrite(data_path+str(ctr)+'_gt.png', bg)
-                composite_img_tuple.append((out_image, bg.astype(np.uint8)))
+                composite_img_tuple.append((out_image, cv2.imread(gt_img_path+fg_img.split("_style")[0]+".png")))
                 ctr += 1
                 print(ctr)
                 break

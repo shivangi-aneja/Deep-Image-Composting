@@ -40,7 +40,7 @@ class Logger:
         self.writer.add_scalar(
             '{}/G_error'.format(mode + '_' +self.comment), g_error, step)
 
-    def log_scores(self, mse, psnr, disc_acc, epoch):
+    def log_scores(self, mode, mse, psnr, disc_acc, epoch):
 
         # var_class = torch.autograd.variable.Variable
         if isinstance(mse, torch.autograd.Variable):
@@ -52,11 +52,11 @@ class Logger:
 
         step = Logger._step(epoch, n_batch=0, num_batches=1)
         self.writer.add_scalar(
-            '{}/mse'.format(self.comment), mse, step)
+            '{}/mse'.format(mode+'_'+self.comment), mse, step)
         self.writer.add_scalar(
-            '{}/psnr'.format(self.comment), psnr, step)
+            '{}/psnr'.format(mode+'_'+self.comment), psnr, step)
         self.writer.add_scalar(
-            '{}/disc_accuracy'.format(self.comment), disc_acc, step)
+            '{}/disc_accuracy'.format(mode+'_'+self.comment), disc_acc, step)
 
 
     def log_images(self, mode, images, num_images, epoch, n_batch, num_batches, normalize=True):

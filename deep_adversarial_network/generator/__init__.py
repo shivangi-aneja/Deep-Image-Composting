@@ -4,7 +4,7 @@
 
 from deep_adversarial_network.generator.test_generator import *
 
-GENERATORS = {"test_generator1"}
+GENERATORS = {"test_generator1", "resnet"}
 
 def get_available_generators():
     """
@@ -27,3 +27,5 @@ def make_generator(name, *args, **kwargs):
 
     elif name == "test_generator1":
         return test_Generator1()
+    elif name == "resnet":
+        return Resnet_Generator()

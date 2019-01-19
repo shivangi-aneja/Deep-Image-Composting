@@ -156,7 +156,6 @@ def create_composite_img_new(comp_img_path,mask_path, gt_img_path, data_path, co
                 foreground = cv2.imread(comp_img_path+fg_img)
                 alpha = cv2.imread(mask_path+fg_img.split("_style")[0]+".png")
                 background = cv2.imread(gt_img_path+fg_img.split("_style")[0]+".png")
-                print(background.dtype)
 
                 # Convert uint8 to float
                 fg = foreground.astype(float)
@@ -179,14 +178,12 @@ def create_composite_img_new(comp_img_path,mask_path, gt_img_path, data_path, co
                 #bg = cv2.normalize(bg, np.zeros((400, 300)), 0, 255, cv2.NORM_MINMAX)
                 cv2.imwrite(data_path+str(ctr)+'_cp.png', out_image)
                 cv2.imwrite(data_path+str(ctr)+'_gt.png', bg)
-                composite_img_tuple.append((out_image, cv2.imread(gt_img_path+fg_img.split("_style")[0]+".png")))
+                composite_img_tuple.append((out_image, bg))
                 ctr += 1
                 print(ctr)
-                break
         except:
             print(comp_img_path+fg_img)
             print(mask_path+fg_img)
-            #print(gt_img_path+bg_img)
 
     np.save(os.path.join(comp_file_path + file_name), composite_img_tuple)
 

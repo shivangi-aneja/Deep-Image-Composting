@@ -176,9 +176,9 @@ def create_composite_img_new(comp_img_path,mask_path, gt_img_path, data_path, co
                 # Display image
                 #out_image = cv2.normalize(out_image, np.zeros((400, 300)), 0, 255, cv2.NORM_MINMAX)
                 #bg = cv2.normalize(bg, np.zeros((400, 300)), 0, 255, cv2.NORM_MINMAX)
-                cv2.imwrite(data_path+str(ctr)+'_cp.png', out_image)
+                cv2.imwrite(data_path+str(ctr)+'_cp.png',  out_image)
                 cv2.imwrite(data_path+str(ctr)+'_gt.png', bg)
-                composite_img_tuple.append((out_image, bg))
+                composite_img_tuple.append((out_image[...,[2,1,0]], bg[...,[2,1,0]]))
                 ctr += 1
                 print(ctr)
         except:

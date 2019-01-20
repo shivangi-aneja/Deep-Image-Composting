@@ -8,3 +8,4 @@ tf_logs/*
 venv/*
 models/*
 data.zip
+weights/*

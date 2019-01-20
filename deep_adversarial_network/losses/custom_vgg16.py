@@ -3,7 +3,7 @@ import tensorflow as tf
 
 import numpy as np
 import time
-from deep_adversarial_network.vgg16 import Vgg16
+from deep_adversarial_network.losses.vgg16 import Vgg16
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 

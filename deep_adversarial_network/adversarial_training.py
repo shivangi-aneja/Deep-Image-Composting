@@ -85,7 +85,7 @@ class DeepGAN(object):
         G_loss2 = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
         G_perceptual_loss = self.perceptual_loss(self.batch_size, G_z, gt_img)
-        G_loss = G_loss2 + 0 * G_loss1 + 0.1*G_perceptual_loss
+        G_loss = G_loss2 + 0.1*G_loss1 + 0.1*G_perceptual_loss
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()

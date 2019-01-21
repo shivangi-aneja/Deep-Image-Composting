@@ -86,7 +86,7 @@ class DeepGAN(object):
 
         G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
         G_rgb_loss =  rgb_loss(self.recon_loss,G_z ,gt_img)
-        G_loss = G_loss2 + 0.0 * G_loss1 + 0.0 * G_perceptual_loss + G_rgb_loss
+        G_loss = G_loss2 + 0.1 * G_loss1 + 0.0 * G_perceptual_loss + 0*G_rgb_loss
 
 
         # trainable variables for each network

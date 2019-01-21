@@ -27,7 +27,7 @@ def resize_images(input_path):
     :param input_path: image path
     :return: None
     """
-    new_size = (400, 300)
+    new_size = (300, 200)
     for image in sorted(os.listdir(input_path)):
         if image.endswith(".png"):
             img = cv2.imread(input_path + image)
@@ -250,10 +250,10 @@ def main():
     # change_img_to_png(input_dir3)
     #
     # # For resizing
-    # resize_images(input_path = gt_dir)
-    # resize_images(input_path = mask_dir)
-    # resize_images(input_path = train_dir_comp)
-    # resize_images(input_path = val_dir_comp)
+    resize_images(input_path = gt_dir)
+    resize_images(input_path = mask_dir)
+    resize_images(input_path = train_dir_comp)
+    resize_images(input_path = val_dir_comp)
 
     # save_to_numpy(comp_img_path=input_dir4, gt_img_path=input_dir5,  path=path, file='big_data')
     # Save to numpy

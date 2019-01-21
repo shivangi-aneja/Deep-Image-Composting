@@ -23,3 +23,17 @@ def perceptual_loss(batch_size, inputs, outputs):
         loss_f += tf.reduce_mean(tf.subtract(f, f_) ** 2)
 
     return loss_f
+
+def rgb_loss(recon_loss, inputs, outputs):
+    """
+    RGB Loss
+    :param recon_loss:
+    :param inputs:
+    :param outputs:
+    :return:
+    """
+
+    r_loss = recon_loss(inputs[:,:,0], outputs[:,:,0])
+    g_loss = recon_loss(inputs[:,:,1], outputs[:,:,1])
+    b_loss = recon_loss(inputs[:,:,2], outputs[:,:,2])
+    return tf.reduce_mean([r_loss, g_loss, b_loss])

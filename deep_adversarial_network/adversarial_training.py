@@ -61,8 +61,8 @@ class DeepGAN(object):
         gan_model_name = model_path + self.model_name + "_model_ckpt/" + self.model_name + ".ckpt"
 
         # variables : input
-        comp_img = tf.placeholder(tf.float32, shape=(None, 300, 400, 3))
-        gt_img = tf.placeholder(tf.float32, shape=(None, 300, 400, 3))
+        comp_img = tf.placeholder(tf.float32, shape=(None, 200, 300, 3))
+        gt_img = tf.placeholder(tf.float32, shape=(None, 200, 300, 3))
         # z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 

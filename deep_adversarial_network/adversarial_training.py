@@ -44,7 +44,6 @@ class DeepGAN(object):
         self.batch_size = batch_size
         self.mplib = mplib
         self.sess = None
-        self.perceptual_loss = perceptual_loss
         # Tensorboard Logging
         self.logger = Logger(model_name=self.model_name, data_name=self.dataset, log_path=tf_log_path)
 
@@ -84,8 +83,8 @@ class DeepGAN(object):
         G_loss1 = tf.reduce_mean(self.recon_loss(gt_img, G_z))
         G_loss2 = tf.reduce_mean(
             tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
-        G_perceptual_loss = self.perceptual_loss(self.batch_size, G_z, gt_img)
-        G_loss = G_loss2 + 0 * G_loss1 + 0.1*G_perceptual_loss
+        G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
+        G_loss = G_loss2 + 0.1 * G_loss1 + 0.1 * G_perceptual_loss
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()
@@ -271,17 +270,18 @@ class DeepGAN(object):
             val_loss_g_, _ = self.sess.run([G_loss,G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_G_losses.append(val_loss_g_)
 
-            self.logger.log_images(mode='composite', images=np.array(comp_image), num_images=len(comp_image),
-                                   epoch=num_epoch, n_batch=iter,
-                                   num_batches=len(test_loader), normalize=True)
+            if iter == len(test_loader)-1:
+                self.logger.log_images(mode='composite', images=np.array(comp_image), num_images=len(comp_image),
+                                       epoch=num_epoch, n_batch=iter,
+                                       num_batches=len(test_loader), normalize=True)
 
-            self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images), epoch=num_epoch,
-                                   n_batch=iter,
-                                   num_batches=len(test_loader), normalize=True)
+                self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images), epoch=num_epoch,
+                                       n_batch=iter,
+                                       num_batches=len(test_loader), normalize=True)
 
-            self.logger.log_images(mode='ground_truth', images=np.array(gt_image), num_images=len(gt_image),
-                                   epoch=num_epoch, n_batch=iter,
-                                   num_batches=len(test_loader), normalize=True)
+                self.logger.log_images(mode='ground_truth', images=np.array(gt_image), num_images=len(gt_image),
+                                       epoch=num_epoch, n_batch=iter,
+                                       num_batches=len(test_loader), normalize=True)
 
         mse_avg_total /= num_iter
         psnr_avg_total /= num_iter

@@ -8,4 +8,4 @@ tf_logs/*
 venv/*
 models/*
 data.zip
-weights/*
+deep_adversarial_network/weights/*

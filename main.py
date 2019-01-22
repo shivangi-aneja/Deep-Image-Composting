@@ -63,7 +63,7 @@ parser.add_argument('-dr', '--discriminator', type=str, default='resnet',
                          "', '".join(get_available_discriminators()) + \
                          "'}")
 
-parser.add_argument('-gr', '--generator', type=str, default='resnet',
+parser.add_argument('-gr', '--generator', type=str, default='skip2',
                     help="generator architecture name, {'" + \
                          "', '".join(get_available_generators()) + \
                          "'}")

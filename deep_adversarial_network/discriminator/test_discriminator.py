@@ -119,7 +119,7 @@ class Resnet_Discriminator(object):
             resnet2_conv2_bn += resnet_conv2_bn
             resnet2_conv2_bn = tf.nn.relu(resnet2_conv2_bn)
 
-            reshape = tf.reshape(resnet2_conv2_bn, shape=[-1, 457856])
+            reshape = tf.reshape(resnet2_conv2_bn, shape=[-1, 48*73*64])
 
             logits = tf.layers.dense(reshape, units=1)
             out = tf.nn.sigmoid(logits)

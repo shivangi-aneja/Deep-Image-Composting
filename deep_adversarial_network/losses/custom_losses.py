@@ -50,7 +50,10 @@ def hsv_loss(ground_truth, predicted):
     hsv_gt = tf.image.rgb_to_hsv(ground_truth)
     hsv_p = tf.image.rgb_to_hsv(predicted)
 
-    loss = tf.losses.mean_squared_error(hsv_gt[:,:,1],hsv_p[:,:,1])
+    loss1 = tf.losses.mean_squared_error(hsv_gt[:,:,0],hsv_p[:,:,0])
+    loss2 = tf.losses.mean_squared_error(hsv_gt[:,:,1],hsv_p[:,:,1])
+    loss = loss1 + loss2
+
     return loss
 
 

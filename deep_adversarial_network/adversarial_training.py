@@ -3,8 +3,7 @@ import pickle
 import time
 
 import matplotlib.pyplot as plt
-import numpy as np
-from deep_adversarial_network.losses.custom_losses import perceptual_loss, rgb_loss
+from deep_adversarial_network.losses.custom_losses import perceptual_loss, rgb_loss, hsv_loss
 from deep_adversarial_network.logging.logger import rootLogger
 from deep_adversarial_network.logging.tf_logger import Logger
 from deep_adversarial_network.metrics.metric_eval import (calc_mse_psnr)
@@ -86,7 +85,8 @@ class DeepGAN(object):
 
         G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
         G_rgb_loss =  rgb_loss(self.recon_loss,G_z ,gt_img)
-        G_loss = G_loss2 + 0.1 * G_loss1 + 0.0 * G_perceptual_loss + 0*G_rgb_loss
+        G_hsv_loss = hsv_loss(weight=1,alpha=1, composite=comp_img, ground_truth=gt_img, predicted=G_z)
+        G_loss = G_loss2 + 0 * G_loss1 + 0 * G_perceptual_loss + 0*G_rgb_loss + 1 * G_hsv_loss
 
 
         # trainable variables for each network

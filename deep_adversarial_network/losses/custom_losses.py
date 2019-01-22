@@ -39,7 +39,22 @@ def rgb_loss(recon_loss, inputs, outputs):
     return tf.reduce_mean([r_loss, g_loss, b_loss])
 
 
-def hsv_loss(weight, alpha, composite, ground_truth, predicted):
+def hsv_loss(ground_truth, predicted):
+    """
+
+    :param composite:
+    :param ground_truth:
+    :param predicted:
+    :return:
+    """
+    hsv_gt = tf.image.rgb_to_hsv(ground_truth)
+    hsv_p = tf.image.rgb_to_hsv(predicted)
+
+    loss = tf.losses.mean_squared_error(hsv_gt[:,:,1],hsv_p[:,:,1])
+    return loss
+
+
+def hsv_loss2(weight, alpha, composite, ground_truth, predicted):
     """
 
     :param composite:

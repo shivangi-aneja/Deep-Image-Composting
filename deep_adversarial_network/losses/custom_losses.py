@@ -37,3 +37,31 @@ def rgb_loss(recon_loss, inputs, outputs):
     g_loss = recon_loss(inputs[:,:,1], outputs[:,:,1])
     b_loss = recon_loss(inputs[:,:,2], outputs[:,:,2])
     return tf.reduce_mean([r_loss, g_loss, b_loss])
+
+
+def hsv_loss(weight, alpha, composite, ground_truth, predicted):
+    """
+
+    :param composite:
+    :param ground_truth:
+    :param predicted:
+    :return:
+    """
+    hsv_comp = tf.image.rgb_to_hsv(composite)
+    hsv_gt = tf.image.rgb_to_hsv(ground_truth)
+    hsv_p = tf.image.rgb_to_hsv(predicted)
+
+    loss1_1 = tf.losses.absolute_difference(hsv_gt[:,:,0],hsv_p[:,:,0])
+    loss1_2 = tf.losses.absolute_difference(hsv_gt[:,:,1],hsv_p[:,:,1])
+    loss1_3 = tf.losses.absolute_difference(hsv_gt[:,:,2],hsv_p[:,:,2])
+
+    loss1 = loss1_1 + loss1_2 + loss1_3
+
+    loss2_1 =  tf.losses.absolute_difference(tf.losses.mean_squared_error(hsv_gt[:,:,0],hsv_comp[:,:,0]), tf.losses.mean_squared_error(hsv_p[:,:,0],hsv_comp[:,:,0]))
+    loss2_2 =  tf.losses.absolute_difference(tf.losses.mean_squared_error(hsv_gt[:,:,1],hsv_comp[:,:,1]), tf.losses.mean_squared_error(hsv_p[:,:,1],hsv_comp[:,:,1]))
+    loss2_3 =  tf.losses.absolute_difference(tf.losses.mean_squared_error(hsv_gt[:,:,2],hsv_comp[:,:,2]), tf.losses.mean_squared_error(hsv_p[:,:,2],hsv_comp[:,:,2]))
+
+    loss2 = loss2_1 + loss2_2 + loss2_3
+
+    loss = loss1 + loss2
+    return loss

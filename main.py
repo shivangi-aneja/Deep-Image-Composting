@@ -28,8 +28,8 @@ OPTIMIZERS = {
 
 # Losses
 LOSSES = {
-    'l1': tf.losses.mean_squared_error,
-    'l2': tf.losses.absolute_difference
+    'l1': tf.losses.absolute_difference,
+    'l2': tf.losses.mean_squared_error
 }
 
 # General Paths

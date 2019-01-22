@@ -85,7 +85,7 @@ class DeepGAN(object):
 
         G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
         G_rgb_loss =  rgb_loss(self.recon_loss,G_z ,gt_img)
-        G_hsv_loss = hsv_loss(weight=1,alpha=1, composite=comp_img, ground_truth=gt_img, predicted=G_z)
+        G_hsv_loss = hsv_loss(ground_truth=gt_img, predicted=G_z)
         G_loss = G_loss2 + 0 * G_loss1 + 0 * G_perceptual_loss + 0*G_rgb_loss + 1 * G_hsv_loss
 
 

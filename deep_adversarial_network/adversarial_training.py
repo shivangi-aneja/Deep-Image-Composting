@@ -9,6 +9,7 @@ from deep_adversarial_network.logging.tf_logger import Logger
 from deep_adversarial_network.metrics.metric_eval import (calc_mse_psnr)
 from deep_adversarial_network.metrics.metric_eval import (d_accuracy)
 from deep_adversarial_network.utils.common_util import *
+from deep_adversarial_network.utils.save_image import save_image
 
 
 class DeepGAN(object):
@@ -296,3 +297,102 @@ class DeepGAN(object):
 
         self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch, n_batch=0,
                         num_batches=1)
+
+
+    def validate_results(self, test_loader, model_path, image_path_gt, image_path_pred):
+        """
+        Function to evaluate the result on test data
+        :param test_loader: Loader for test data
+        :param num_epoch: Epoch Number
+        :param G_z: Random Gaussian Noise vector
+        :param comp_img: Composite Image Hol
+        :param gt_img:
+        :param isTrain:
+        :param show:
+        :param save:
+        :param path:
+        :param tf_log_path:
+        :return:
+        """
+
+        # Name to store the GAN model
+        gan_model_name = model_path + self.model_name + "_model_ckpt/" + self.model_name + ".ckpt"
+
+        # variables : input
+        comp_img = tf.placeholder(tf.float32, shape=(None, 200, 300, 3))
+        gt_img = tf.placeholder(tf.float32, shape=(None, 200, 300, 3))
+        # z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
+        isTrain = tf.placeholder(dtype=tf.bool)
+
+        # networks : generator
+        G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
+
+        # networks : discriminator
+        D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
+        D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
+
+        # loss for each network
+        D_loss_real = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_real_logits, labels=tf.ones_like(D_real_logits)))
+        D_loss_fake = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+        D_loss = D_loss_real + D_loss_fake
+
+        G_loss1 = tf.reduce_mean(self.recon_loss(gt_img, G_z))
+        G_loss2 = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+
+        G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
+        G_rgb_loss = rgb_loss(self.recon_loss, G_z, gt_img)
+        G_hsv_loss = hsv_loss(ground_truth=gt_img, predicted=G_z)
+        G_loss = G_loss2 + 0 * G_loss1 + 0 * G_perceptual_loss + 0 * G_rgb_loss + 1 * G_hsv_loss
+
+        # trainable variables for each network
+        T_vars = tf.trainable_variables()
+        D_vars = [var for var in T_vars if var.name.startswith('discriminator')]
+        G_vars = [var for var in T_vars if var.name.startswith('generator')]
+
+        # optimizer for each network
+        with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+            D_optim = self.d_optim(self.d_lr, beta1=0.5).minimize(D_loss, var_list=D_vars)
+            G_optim = self.g_optim(self.g_lr, beta1=0.5).minimize(G_loss, var_list=G_vars)
+
+        # open session and initialize all variables
+        # Try to restore model weights from previously saved model
+        self.sess = tf.InteractiveSession()
+        try:
+            # 'Saver' op to save and restore all the variables
+            rootLogger.info("Loading Saved Model")
+            saver = tf.train.Saver()
+            init = tf.global_variables_initializer()
+            self.sess.run(init)
+            saver.restore(self.sess, gan_model_name)
+            rootLogger.info("Saved Model successfully loaded")
+        except:
+            tf.global_variables_initializer().run()
+            rootLogger.info("Model not found, Created a new one")
+
+
+        mse_avg_total = 0.0
+        psnr_avg_total = 0.0
+        Disc_accuracy_total = 0.0
+
+        num_iter = len(test_loader)
+        for iter, (comp_image, gt_image) in enumerate(test_loader):
+            test_images = self.sess.run(G_z, {comp_img: comp_image, gt_img: gt_image, isTrain: False})
+
+            mse_avg_iter, psnr_avg_iter = calc_mse_psnr(test_images, gt_image)
+
+            mse_avg_total += mse_avg_iter
+            psnr_avg_total += psnr_avg_iter
+
+            # Save the predicted masks
+            ctr = iter * self.batch_size
+            save_image(test_images, image_path=image_path_pred, file_num=ctr, mode='pred')
+            save_image(gt_image, image_path=image_path_gt, file_num=ctr, mode='gt')
+
+
+        mse_avg_total /= num_iter
+        psnr_avg_total /= num_iter
+        Disc_accuracy_total /= num_iter
+

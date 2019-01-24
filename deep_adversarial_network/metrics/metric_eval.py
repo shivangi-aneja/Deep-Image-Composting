@@ -70,3 +70,25 @@ def d_accuracy(real_prob, fake_prob):
     return np.mean([acc_real, acc_fake])
 
 
+def get_ssim(image_gen, image_gt):
+    """
+    Returns SSIM
+    :param image_gen: Generated Images
+    :param image_gt: Real Images
+    :return: SSIM
+    """
+
+    im1 = tf.image.convert_image_dtype(image_gen, tf.float32)
+    im2 = tf.image.convert_image_dtype(image_gt, tf.float32)
+    ssim = tf.image.ssim(im1, im2, max_val=1.0)
+    return ssim
+
+def get_total_variation(image_gen):
+    """
+    Returns Total Variation
+    :param image_gen:
+    :return:
+    """
+    tv = tf.image.total_variation(image_gen,name=None)
+    return tv
+

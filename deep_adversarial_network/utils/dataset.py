@@ -99,8 +99,8 @@ class BIG_DATA(BaseDataset):
         train_tuple = np.load(dirpath + '/train.npy')
         val_tuple = np.load(dirpath + '/val.npy')
 
-        train_data = torch.stack([torch.Tensor(i) for i in train_tuple[0:100]])
-        val_data = torch.stack([torch.Tensor(i) for i in train_tuple[0:10]])
+        train_data = torch.stack([torch.Tensor(i) for i in train_tuple[0:1]])
+        val_data = torch.stack([torch.Tensor(i) for i in train_tuple[0:1]])
 
         train = CustomDataset2(comp_image=train_data[:, 0, :, :], gt_img=train_data[:, 1, :, :])
         val = CustomDataset2(comp_image=val_data[:, 0, :, :], gt_img=val_data[:, 1, :, :])

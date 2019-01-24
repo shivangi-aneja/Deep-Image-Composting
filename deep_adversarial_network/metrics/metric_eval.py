@@ -87,6 +87,6 @@ def get_total_variation(image_gen):
     :param image_gen: Generated Images
     :return: Total Variation
     """
-    tv = tf.metrics.mean(tf.image.total_variation(image_gen,name=None)).eval()
+    tv = tf.reduce_sum(tf.image.total_variation(image_gen,name=None)).eval()
     return tv
 

@@ -70,8 +70,12 @@ class DeepGAN(object):
         G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
 
         # networks : discriminator
-        D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
-        D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
+        #D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
+        #D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
+
+        #network: Patch Discriminator
+        D_real, D_real_logits = self.discriminator.make_discriminator_network(comp_img,gt_img, isTrain=isTrain)
+        D_fake, D_fake_logits = self.discriminator.make_discriminator_network(comp_img, G_z, reuse=True, isTrain=isTrain)
 
         # loss for each network
         D_loss_real = tf.reduce_mean(
@@ -261,8 +265,12 @@ class DeepGAN(object):
             mse_avg_total += mse_avg_iter
             psnr_avg_total += psnr_avg_iter
 
-            D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
-            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: test_images, isTrain: False})
+            #D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
+            #D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: test_images, isTrain: False})
+
+            #patch GAN
+            D_real_prob, _ = self.sess.run([D_real, D_real_logits], {comp_img:comp_image, gt_img: gt_image, isTrain: False})
+            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {comp_img:comp_image, G_z: test_images, isTrain: False})
 
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy

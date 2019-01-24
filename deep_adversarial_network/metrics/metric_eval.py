@@ -78,7 +78,7 @@ def get_ssim(image_gen, image_gt):
     :return: SSIM
     """
     num_imgs = image_gen.shape[0]
-    ssim = tf.image.ssim_multiscale(tf.convert_to_tensor(image_gen), tf.convert_to_tensor(image_gt), max_val=1.0).eval()
+    ssim = tf.reduce_mean(tf.image.ssim_multiscale(tf.convert_to_tensor(image_gen), tf.convert_to_tensor(image_gt), max_val=1.0)).eval()
     return ssim
 
 def get_total_variation(image_gen):
@@ -87,6 +87,6 @@ def get_total_variation(image_gen):
     :param image_gen: Generated Images
     :return: Total Variation
     """
-    tv = tf.reduce_sum(tf.image.total_variation(image_gen,name=None)).eval()
+    tv = tf.reduce_mean(tf.image.total_variation(image_gen,name=None)).eval()
     return tv
 

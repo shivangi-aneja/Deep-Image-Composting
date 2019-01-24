@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from deep_adversarial_network.losses.custom_losses import perceptual_loss, rgb_loss, hsv_loss
 from deep_adversarial_network.logging.logger import rootLogger
 from deep_adversarial_network.logging.tf_logger import Logger
-from deep_adversarial_network.metrics.metric_eval import (calc_mse_psnr, get_total_variation,get_ssim)
+from deep_adversarial_network.metrics.metric_eval import *
 from deep_adversarial_network.metrics.metric_eval import (d_accuracy)
 from deep_adversarial_network.utils.common_util import *
 from deep_adversarial_network.utils.save_image import save_image
@@ -338,6 +338,7 @@ class DeepGAN(object):
         psnr_avg_total = 0.0
         tv_avg_total = 0.0
         ssim_avg_total = 0.0
+        vif_avg_total = 0.0
 
         num_iter = len(test_loader)
         for iter, (comp_image, gt_image) in enumerate(test_loader):
@@ -346,11 +347,13 @@ class DeepGAN(object):
             mse_avg_iter, psnr_avg_iter = calc_mse_psnr(test_images, gt_image)
             tv_avg_iter = get_total_variation(tf.convert_to_tensor(test_images))
             ssim_avg_iter = get_ssim(test_images, gt_image)
+            vif_avg_iter = calc_vif(test_images, gt_image)
 
             mse_avg_total += mse_avg_iter
             psnr_avg_total += psnr_avg_iter
             tv_avg_total += tv_avg_iter
             ssim_avg_total += ssim_avg_iter
+            vif_avg_total +=vif_avg_iter
 
             # Save the predicted masks
             ctr = iter * self.batch_size
@@ -363,6 +366,7 @@ class DeepGAN(object):
         psnr_avg_total /= num_iter
         tv_avg_total /= num_iter
         ssim_avg_total /= num_iter
+        vif_avg_total /=num_iter
 
-        rootLogger.info("MSE : %.3f, PSNR : %.3f, TV : %.3f  SSIM : %.3f"% (mse_avg_total, psnr_avg_total, tv_avg_total, ssim_avg_total))
+        rootLogger.info("MSE : %.3f, PSNR : %.3f, TV : %.3f  SSIM : %.3f  VIF: %3F"% (mse_avg_total, psnr_avg_total, tv_avg_total, ssim_avg_total, vif_avg_total))
 

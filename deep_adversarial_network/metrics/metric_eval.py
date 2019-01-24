@@ -27,10 +27,10 @@ def calc_mse(imageA, imageB):
 
 def calc_vif(img_list1, img_list2):
     """
-        Calculate VIF for a set of Images
-        :param img_list1: Image List1
-        :param img_list2: Image List2
-        :return: VIF
+    Calculate VIF for a set of Images
+    :param img_list1: Test Image
+    :param img_list2: Ground Truth Image
+    :return: VIF
     """
 
     sigma_nsq = 2
@@ -38,10 +38,11 @@ def calc_vif(img_list1, img_list2):
 
     num = 0.0
     den = 0.0
+    vifp = 0.
     num_imgs = img_list1.shape[0]
-    for i in range(len(num_imgs)):
+    for i in range(num_imgs):
         ref = img_list2[i].numpy()
-        dist = img_list1[i].numpy()
+        dist = img_list1[i]
         for scale in range(1, 5):
 
             N = 2 ** (4 - scale + 1) + 1
@@ -82,7 +83,7 @@ def calc_vif(img_list1, img_list2):
             num += np.sum(np.log10(1 + g * g * sigma1_sq / (sv_sq + sigma_nsq)))
             den += np.sum(np.log10(1 + sigma1_sq / sigma_nsq))
 
-        vifp = num / den
+        vifp += num / den
 
     return vifp/num_imgs
 

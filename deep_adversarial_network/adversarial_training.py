@@ -356,7 +356,7 @@ class DeepGAN(object):
             ctr = iter * self.batch_size
             save_image(tf.convert_to_tensor(test_images), image_path=image_path_pred, file_num=ctr, mode='pred')
             save_image(tf.convert_to_tensor(gt_image), image_path=image_path_gt, file_num=ctr, mode='gt')
-            save_image(tf.convert_to_tensor(comp_image), image_path=image_path_pred, file_num=ctr, mode='pred')
+            save_image(tf.convert_to_tensor(comp_image), image_path=image_path_comp, file_num=ctr, mode='comp')
 
 
         mse_avg_total /= num_iter

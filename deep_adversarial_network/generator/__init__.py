@@ -1,5 +1,5 @@
 """
- init class for all the discrimina for all the datasets
+ init class for all the generators for all the datasets
 """
 
 from deep_adversarial_network.generator.test_generator import *

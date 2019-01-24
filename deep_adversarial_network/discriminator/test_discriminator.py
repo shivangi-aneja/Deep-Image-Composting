@@ -1,5 +1,5 @@
 """
-discriminator for mnist dataset
+discriminators for dataset
 """
 from deep_adversarial_network.utils.common_util import *
 

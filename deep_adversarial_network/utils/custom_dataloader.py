@@ -1,3 +1,6 @@
+"""
+    Class for creating custom dataloaders
+"""
 from torch.utils.data import Dataset
 
 

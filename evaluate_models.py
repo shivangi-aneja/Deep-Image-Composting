@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
- Main file to train and evaluate the models
+ Main file to evaluate the models
 """
 
 import argparse
@@ -168,10 +168,9 @@ def main(args=args):
     # Create GAN according to params
     model = DeepGAN(discriminator=discriminator, generator=generator, model_name=args.model_name, recon_loss=recon_loss,
                     dataset=args.dataset, batch_size=args.batch_size, d_optim=d_optim, g_optim=g_optim, d_lr=d_lr,
-                    g_lr=g_lr,
-                    epochs=args.epochs, mplib=mplib, tf_log_path="")
-    # Train the model
-    model.validate_results(test_loader=val_loader, model_path=MODEL_PATH, image_path_gt=IMAGE_PATH + "gt/", image_path_pred=IMAGE_PATH +"pred")
+                    g_lr=g_lr,epochs=args.epochs, mplib=mplib, tf_log_path="")
+    # Test the model
+    model.validate_results(test_loader=val_loader, model_path=MODEL_PATH, image_path_gt=IMAGE_PATH + "gt/", image_path_pred=IMAGE_PATH +"pred/")
 
 
 if __name__ == '__main__':

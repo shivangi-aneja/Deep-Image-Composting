@@ -1,5 +1,5 @@
 """
- init class for all the discrimina for all the datasets
+ init class for all the discriminators for all the datasets
 """
 
 from deep_adversarial_network.discriminator.test_discriminator import *

@@ -1,3 +1,6 @@
+"""
+    Custom Losses Implemented for the network
+"""
 from deep_adversarial_network.losses.custom_vgg16 import *
 
 

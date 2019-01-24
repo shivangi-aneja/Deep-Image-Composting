@@ -22,4 +22,4 @@ def save_image(tensor_minibatch, image_path, file_num, mode):
     num_imgs = tensor_minibatch.shape[0]
     for i in range(num_imgs):
         file = mode+"_" + str(file_num+i)+".png"
-        vutils.save_image(tensor=torch.tensor(tf.transpose(a=tensor_minibatch[i], perm=[1,2,0])).float(), filename=image_path+file, normalize=True)
+        vutils.save_image(tensor=torch.tensor(tf.transpose(a=tensor_minibatch[i], perm=[2,0,1]).eval()).float(), filename=image_path+file, normalize=True)

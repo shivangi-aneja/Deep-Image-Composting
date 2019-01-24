@@ -262,7 +262,7 @@ class DeepGAN(object):
             psnr_avg_total += psnr_avg_iter
 
             D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
-            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: comp_image, isTrain: False})
+            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: test_images, isTrain: False})
 
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy
@@ -299,7 +299,7 @@ class DeepGAN(object):
                         num_batches=1)
 
 
-    def validate_results(self, test_loader, model_path, image_path_gt, image_path_pred):
+    def validate_results(self, test_loader, model_path, image_path_gt, image_path_pred, image_path_comp):
         """
         Function to evaluate the result on test data
         :param test_loader:
@@ -356,6 +356,7 @@ class DeepGAN(object):
             ctr = iter * self.batch_size
             save_image(tf.convert_to_tensor(test_images), image_path=image_path_pred, file_num=ctr, mode='pred')
             save_image(tf.convert_to_tensor(gt_image), image_path=image_path_gt, file_num=ctr, mode='gt')
+            save_image(tf.convert_to_tensor(comp_image), image_path=image_path_pred, file_num=ctr, mode='pred')
 
 
         mse_avg_total /= num_iter

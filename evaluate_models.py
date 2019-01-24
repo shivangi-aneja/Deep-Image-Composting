@@ -143,7 +143,7 @@ def main(args=args):
 
     val_loader = DataLoader(dataset=val_dataset,
                             batch_size=batch_size,
-                            shuffle=True,
+                            shuffle=False,
                             num_workers=args.n_workers)
 
     # build discriminator model
@@ -170,7 +170,8 @@ def main(args=args):
                     dataset=args.dataset, batch_size=args.batch_size, d_optim=d_optim, g_optim=g_optim, d_lr=d_lr,
                     g_lr=g_lr,epochs=args.epochs, mplib=mplib, tf_log_path="")
     # Test the model
-    model.validate_results(test_loader=val_loader, model_path=MODEL_PATH, image_path_gt=IMAGE_PATH + "gt/", image_path_pred=IMAGE_PATH +"pred/")
+    model.validate_results(test_loader=val_loader, model_path=MODEL_PATH, image_path_gt=IMAGE_PATH + "gt/", image_path_pred=IMAGE_PATH +"pred/",
+                           image_path_comp=IMAGE_PATH + "comp/")
 
 
 if __name__ == '__main__':

@@ -125,3 +125,40 @@ class Resnet_Discriminator(object):
             out = tf.nn.sigmoid(logits)
 
         return out, logits
+
+
+class Patch_Discriminator(object):
+    """
+    working
+    """
+
+    def __init__(self):
+        pass
+
+    def make_discriminator_network(self, discrim_inputs, discrim_targets , reuse=False, isTrain=True):
+        with tf.variable_scope("discriminator", reuse=reuse):
+            # input = tf.placeholder(tf.float32, (None, 16, 16, 3), name="input")
+            discrim_inputs = tf.image.resize_images(discrim_inputs, (256, 256))
+            discrim_targets = tf.image.resize_images(discrim_targets, (256,256))
+            x = tf.concat([discrim_inputs, discrim_targets], axis=3)
+
+            conv1 = discrim_conv(x, 32, stride=2)
+            conv1_bn = tf.layers.batch_normalization(conv1)
+            conv1_bn = tf.nn.leaky_relu(conv1_bn)
+
+            conv2 = discrim_conv(conv1_bn, 64, stride=2)
+            conv2_bn = tf.layers.batch_normalization(conv2)
+            conv2_bn = tf.nn.leaky_relu(conv2_bn)
+
+            conv3 = discrim_conv(conv2_bn, 128, stride=2)
+            conv3_bn = tf.layers.batch_normalization(conv3)
+            conv3_bn = tf.nn.leaky_relu(conv3_bn)
+
+            conv4 = discrim_conv(conv3_bn, 256, stride=1)
+            conv4_bn = tf.layers.batch_normalization(conv4)
+            conv4_bn = tf.nn.leaky_relu(conv4_bn)
+
+            logits = discrim_conv(conv4_bn, 1, stride=1)
+            out = tf.nn.sigmoid(logits)
+
+        return out, logits

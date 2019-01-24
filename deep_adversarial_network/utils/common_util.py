@@ -43,6 +43,9 @@ def fixed_padding(inputs, kernel_size):
                                     [pad_beg, pad_end], [0, 0]])
     return padded_inputs
 
+def discrim_conv(batch_input, out_channels, stride):
+    padded_input = tf.pad(batch_input, [[0, 0], [1, 1], [1, 1], [0, 0]], mode="CONSTANT")
+    return tf.layers.conv2d(padded_input, out_channels, kernel_size=4, strides=(stride, stride), padding="valid", kernel_initializer=tf.random_normal_initializer(0, 0.02))
 
 def conv2d_fixed_padding(inputs, filters, kernel_size, strides):
     """Strided 2-D convolution with explicit padding."""

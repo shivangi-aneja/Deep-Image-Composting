@@ -363,5 +363,5 @@ class DeepGAN(object):
         tv_avg_total /= num_iter
         ssim_avg_total /= num_iter
 
-        rootLogger.info("MSE : %.3f, PSNR : %.3f, TV : %.3f  SSIM : %.3f"% (mse_avg_total, psnr_avg_total, tv_avg_total.eval(), ssim_avg_total))
+        rootLogger.info("MSE : %.3f, PSNR : %.3f, TV : %.3f  SSIM : %.3f"% (mse_avg_total, psnr_avg_total, tv_avg_total, ssim_avg_total))
 

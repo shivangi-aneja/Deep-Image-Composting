@@ -218,6 +218,7 @@ def create_composite_img_new(comp_img_path, mask_path, gt_img_path, data_path, c
                 # BGR to RGB while writing to numpy file
                 cv2.imwrite(data_path + str(ctr) + '_cp.png', out_image)
                 cv2.imwrite(data_path + str(ctr) + '_gt.png', bg)
+                cv2.imwrite(data_path + str(ctr) + '_mask.png', cv2.imread(mask_path + fg_img.split("_style")[0] + ".png"))
                 composite_img_tuple.append((out_image[..., [2, 1, 0]], bg[..., [2, 1, 0]]))
                 ctr += 1
                 print(ctr)
@@ -260,9 +261,9 @@ def main():
     # save_to_numpy_array(fg_img_path=input_dir3, fg_mask_path=input_dir2, bg_path=input_dir1, path=path)
 
     # Create Composite Images Train
-    create_composite_img_new(comp_img_path=train_dir_comp, gt_img_path=gt_dir, mask_path=mask_dir,
-                             data_path=train_dir_data,
-                             comp_file_path=path, file_name="train.npy")
+    # create_composite_img_new(comp_img_path=train_dir_comp, gt_img_path=gt_dir, mask_path=mask_dir,
+    #                          data_path=train_dir_data,
+    #                          comp_file_path=path, file_name="train.npy")
 
     # Create Composite Images Val
     create_composite_img_new(comp_img_path=val_dir_comp, gt_img_path=gt_dir, mask_path=mask_dir,

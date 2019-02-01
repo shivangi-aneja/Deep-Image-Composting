@@ -273,7 +273,7 @@ class Multi_Generator1():
 
             conv1_bn = tf.layers.batch_normalization(conv1)
 
-            conv2 = tf.layers.conv2d(inputs=conv1_bn, filters=128, kernel_size=(3, 3), padding='valid', strides=2,
+            conv2 = tf.layers.conv2d(inputs=conv1_bn, filters=64, kernel_size=(3, 3), padding='valid', strides=2,
                                      activation=tf.nn.leaky_relu,
                                      kernel_initializer=tf.contrib.layers.xavier_initializer())
 
@@ -282,12 +282,12 @@ class Multi_Generator1():
 
 
 
-            conv3 = tf.layers.conv2d(inputs=input_low, filters=128, kernel_size=(3, 3), padding='same', strides=1,
+            conv3 = tf.layers.conv2d(inputs=input_low, filters=64, kernel_size=(3, 3), padding='same', strides=1,
                                      activation=tf.nn.leaky_relu,
                                      kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv3_bn = tf.layers.batch_normalization(conv3)
 
-            conv4 = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), padding='same', strides=1,
+            conv4 = tf.layers.conv2d(inputs=conv3_bn, filters=128, kernel_size=(3, 3), padding='same', strides=1,
                                      activation=tf.nn.leaky_relu,
                                      kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv4_bn = tf.layers.batch_normalization(conv4)
@@ -307,14 +307,14 @@ class Multi_Generator1():
             deconv5_bn = tf.layers.batch_normalization(deconv5)
 
 
-            deconv4 = tf.layers.conv2d_transpose(inputs=deconv5_bn, filters=256, kernel_size=(3, 3), padding='same', strides=1,
+            deconv4 = tf.layers.conv2d_transpose(inputs=deconv5_bn, filters=128, kernel_size=(3, 3), padding='same', strides=1,
                                                  activation=tf.nn.leaky_relu,
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())
 
             deconv4 += conv4
             deconv4_bn = tf.layers.batch_normalization(deconv4)
 
-            deconv3 = tf.layers.conv2d_transpose(inputs=deconv4_bn, filters=128, kernel_size=(3, 3), padding='same',
+            deconv3 = tf.layers.conv2d_transpose(inputs=deconv4_bn, filters=64, kernel_size=(3, 3), padding='same',
                                                  strides=1,
                                                  activation=tf.nn.leaky_relu,
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())
@@ -324,7 +324,7 @@ class Multi_Generator1():
 
             # End : Small Gen
 
-            deconv2 = tf.layers.conv2d_transpose(inputs=conv2_bn + deconv3_bn, filters=128, kernel_size=(3, 3), padding='valid',
+            deconv2 = tf.layers.conv2d_transpose(inputs=conv2_bn + deconv3_bn, filters=64, kernel_size=(3, 3), padding='valid',
                                                  strides=2,
                                                  activation=tf.nn.leaky_relu,
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())

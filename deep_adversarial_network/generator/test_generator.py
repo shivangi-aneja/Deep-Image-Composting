@@ -333,6 +333,7 @@ class Multi_Generator():
             deconv1 = tf.layers.conv2d_transpose(inputs=deconv2_bn, filters=64, kernel_size=(3, 3), padding='same',
                                                  activation=tf.nn.leaky_relu,
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())
+            deconv1 = tf.pad(deconv1,[[0,0],[1,0],[1,0],[0,0]])
             deconv1 += conv1
             deconv1_bn = tf.layers.batch_normalization(deconv1)
 

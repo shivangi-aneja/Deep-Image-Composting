@@ -307,7 +307,7 @@ class Multi_Generator():
             deconv5_bn = tf.layers.batch_normalization(deconv5)
 
 
-            deconv4 = tf.layers.conv2d_transpose(inputs=deconv5_bn, filters=256, kernel_size=(3, 3), padding='valid', strides=1,
+            deconv4 = tf.layers.conv2d_transpose(inputs=deconv5_bn, filters=256, kernel_size=(3, 3), padding='same', strides=1,
                                                  activation=tf.nn.leaky_relu,
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())
 

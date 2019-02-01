@@ -4,7 +4,7 @@
 
 from deep_adversarial_network.generator.test_generator import *
 
-GENERATORS = {"test_generator1", "skip1", "skip2"}
+GENERATORS = {"test_generator1", "skip1", "skip2", "multi"}
 
 
 def get_available_generators():
@@ -33,3 +33,5 @@ def make_generator(name, *args, **kwargs):
         return Skip_Generator1()
     elif name == "skip2":
         return Skip_Generator2()
+    elif name == "multi":
+        return  Multi_Generator()

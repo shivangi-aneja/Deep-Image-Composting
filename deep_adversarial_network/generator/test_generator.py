@@ -278,7 +278,7 @@ class Multi_Generator():
                                      kernel_initializer=tf.contrib.layers.xavier_initializer())
 
             conv2_bn = tf.layers.batch_normalization(conv2)
-            print(conv2_bn.shape)
+            #print(conv2_bn.shape)
 
             #small Gen
 
@@ -286,7 +286,7 @@ class Multi_Generator():
                                      activation=tf.nn.leaky_relu,
                                      kernel_initializer=tf.contrib.layers.xavier_initializer())
             conv3_bn = tf.layers.batch_normalization(conv3)
-            print(conv3_bn.shape)
+            #print(conv3_bn.shape)
 
             # Block1
 
@@ -363,17 +363,17 @@ class Multi_Generator():
             resnet4_conv2_bn += resnet3_conv2_bn
             resnet4_conv2_bn = tf.nn.relu(resnet4_conv2_bn)
 
-            print(resnet4_conv2_bn.shape)
+            #print(resnet4_conv2_bn.shape)
 
 
             deconv1 = tf.layers.conv2d_transpose(inputs=resnet4_conv2_bn, filters=64, kernel_size=(3, 3), padding='valid', strides=2,
                                                  activation=tf.nn.leaky_relu,
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())
             deconv1 = tf.pad(deconv1, [[0,0],[1,0],[1,0],[0,0]])
-            print((deconv1.shape))
-            deconv1 += conv1
+            #print((deconv1.shape))
+            #deconv1 += conv1
             deconv1_bn = tf.layers.batch_normalization(deconv1)
-            print((deconv1_bn.shape))
+            #print((deconv1_bn.shape))
 
             deconv0 = tf.layers.conv2d_transpose(inputs=deconv1_bn, filters=3, kernel_size=(3, 3), padding='same',
                                                  activation=tf.nn.leaky_relu,

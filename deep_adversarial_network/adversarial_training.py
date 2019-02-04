@@ -67,14 +67,13 @@ class DeepGAN(object):
         isTrain = tf.placeholder(dtype=tf.bool)
 
         # networks : generator
-        G_z, G_z_small = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
+        G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
 
         # networks : discriminator
         #D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
         #D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
 
         #network: Patch Discriminator
-        gt_img_small = tf.image.resize_images(gt_img, [99, 149], align_corners=True)
         D_real, D_real_logits = self.discriminator.make_discriminator_network(comp_img,gt_img, isTrain=isTrain)
         D_fake, D_fake_logits = self.discriminator.make_discriminator_network(comp_img, G_z, reuse=True, isTrain=isTrain)
 
@@ -94,19 +93,17 @@ class DeepGAN(object):
         G_loss = G_loss2 + 50 * G_loss1 + 100 * G_perceptual_loss + 0*G_rgb_loss + 150 * G_hsv_loss
         G_loss /=1000
 
-        G_loss_small = tf.reduce_mean(self.recon_loss(gt_img_small, G_z_small))
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()
         D_vars = [var for var in T_vars if var.name.startswith('discriminator')]
         G_vars = [var for var in T_vars if var.name.startswith('generator')]
-        G_vars_small = [var for var in T_vars if var.name.startswith('small_generator')]
 
         # optimizer for each network
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-            #D_optim = self.d_optim(self.d_lr, beta1=0.5).minimize(D_loss, var_list=D_vars)
-            #G_optim = self.g_optim(self.g_lr, beta1=0.5).minimize(G_loss, var_list=G_vars)
-            G_optim_small = self.g_optim(self.g_lr, beta1=0.5).minimize(G_loss_small, var_list=G_vars)
+            D_optim = self.d_optim(self.d_lr, beta1=0.5).minimize(D_loss, var_list=D_vars)
+            G_optim = self.g_optim(self.g_lr, beta1=0.5).minimize(G_loss, var_list=G_vars)
+
         # open session and initialize all variables
         # Try to restore model weights from previously saved model
         self.sess = tf.InteractiveSession()
@@ -151,14 +148,12 @@ class DeepGAN(object):
             D_losses = []
             for epoch_iter, (comp_image, gt_image) in enumerate(train_loader):
                 # update discriminator
-                #loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
-                D_losses.append(0)
+                loss_d_, _ = self.sess.run([D_loss, D_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+                D_losses.append(loss_d_)
 
                 # update generator
-                #loss_g_, _ = self.sess.run([G_loss, G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
-                #G_losses.append(loss_g_)
-                loss_g_small, _ = self.sess.run([G_loss_small, G_optim_small], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
-                G_losses.append(loss_g_small)
+                loss_g_, _ = self.sess.run([G_loss, G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: True})
+                G_losses.append(loss_g_)
 
             # Log the training losses
             self.logger.log(mode="train", d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch + 1, n_batch=0,
@@ -171,11 +166,10 @@ class DeepGAN(object):
             fixed_p = model_path + 'Fixed_results/' + model + str(epoch + 1) + '.png'
 
             # Evaluate the model after every epoch
-            # self.evaluate_test_data(num_epoch=(epoch + 1), test_loader=test_loader, G_z=G_z, D_fake=D_fake,
-            #                         D_fake_logits=D_fake_logits, D_real=D_real, D_real_logits=D_real_logits,
-            #                         D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img, gt_img=gt_img,
-            #                         isTrain=isTrain, show=False, save=True, path=fixed_p)
-
+            self.evaluate_test_data(num_epoch=(epoch + 1), test_loader=test_loader, G_z=G_z, D_fake=D_fake,
+                                    D_fake_logits=D_fake_logits, D_real=D_real, D_real_logits=D_real_logits,
+                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img, gt_img=gt_img,
+                                    isTrain=isTrain, show=False, save=True, path=fixed_p)
 
             # Save the model after every 10 epochs
             if (epoch + 1) % 10 == 0:

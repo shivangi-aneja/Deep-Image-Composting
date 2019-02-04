@@ -368,53 +368,53 @@ class Multi_Generator2():
 
             conv2_bn = tf.layers.batch_normalization(conv2)
             # small Gen
-            with tf.variable_scope("small_generator", reuse=reuse):
-                conv3 = tf.layers.conv2d(inputs=input_low, filters=128, kernel_size=(7, 7), padding='same',
-                                         activation=tf.nn.leaky_relu,
-                                         kernel_initializer=tf.contrib.layers.xavier_initializer())
-                conv3_bn = tf.layers.batch_normalization(conv3)
-                conv3_bn = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), padding='same',
-                                         activation=tf.nn.leaky_relu,
-                                         kernel_initializer=tf.contrib.layers.xavier_initializer())
-                conv3_bn = tf.layers.batch_normalization(conv3_bn)
 
-                # Block1
+            conv3 = tf.layers.conv2d(inputs=input_low, filters=128, kernel_size=(7, 7), padding='same',
+                                     activation=tf.nn.leaky_relu,
+                                     kernel_initializer=tf.contrib.layers.xavier_initializer())
+            conv3_bn = tf.layers.batch_normalization(conv3)
+            conv3_bn = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), padding='same',
+                                     activation=tf.nn.leaky_relu,
+                                     kernel_initializer=tf.contrib.layers.xavier_initializer())
+            conv3_bn = tf.layers.batch_normalization(conv3_bn)
 
-                resnet_conv1 = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), strides=1,
-                                                kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
-                resnet_conv1_bn = tf.layers.batch_normalization(resnet_conv1)
-                resnet_conv1_bn = tf.nn.relu(resnet_conv1_bn)
+            # Block1
 
-                resnet_conv2 = tf.layers.conv2d(inputs=resnet_conv1_bn, filters=256, kernel_size=(3, 3), strides=1,
-                                                kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
+            resnet_conv1 = tf.layers.conv2d(inputs=conv3_bn, filters=256, kernel_size=(3, 3), strides=1,
+                                            kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
+            resnet_conv1_bn = tf.layers.batch_normalization(resnet_conv1)
+            resnet_conv1_bn = tf.nn.relu(resnet_conv1_bn)
 
-                resnet_conv2_bn = tf.layers.batch_normalization(resnet_conv2)
-                resnet_conv2_bn = tf.nn.relu(resnet_conv2_bn)
+            resnet_conv2 = tf.layers.conv2d(inputs=resnet_conv1_bn, filters=256, kernel_size=(3, 3), strides=1,
+                                            kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
 
-                resnet_conv2_bn += conv3_bn
-                resnet_conv2_bn = tf.nn.relu(resnet_conv2_bn)
+            resnet_conv2_bn = tf.layers.batch_normalization(resnet_conv2)
+            resnet_conv2_bn = tf.nn.relu(resnet_conv2_bn)
 
-                # Block2
+            resnet_conv2_bn += conv3_bn
+            resnet_conv2_bn = tf.nn.relu(resnet_conv2_bn)
 
-                resnet2_conv1 = tf.layers.conv2d(inputs=resnet_conv2_bn, filters=256, kernel_size=(3, 3), strides=1,
-                                                 kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
+            # Block2
 
-                resnet2_conv1_bn = tf.layers.batch_normalization(resnet2_conv1)
-                resnet2_conv1_bn = tf.nn.relu(resnet2_conv1_bn)
+            resnet2_conv1 = tf.layers.conv2d(inputs=resnet_conv2_bn, filters=256, kernel_size=(3, 3), strides=1,
+                                             kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
 
-                resnet2_conv2 = tf.layers.conv2d(inputs=resnet2_conv1_bn, filters=256, kernel_size=(3, 3), strides=1,
-                                                 kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
+            resnet2_conv1_bn = tf.layers.batch_normalization(resnet2_conv1)
+            resnet2_conv1_bn = tf.nn.relu(resnet2_conv1_bn)
 
-                resnet2_conv2_bn = tf.layers.batch_normalization(resnet2_conv2)
-                resnet2_conv2_bn = tf.nn.relu(resnet2_conv2_bn)
+            resnet2_conv2 = tf.layers.conv2d(inputs=resnet2_conv1_bn, filters=256, kernel_size=(3, 3), strides=1,
+                                             kernel_initializer=tf.contrib.layers.xavier_initializer(), padding="same")
 
-                resnet2_conv2_bn += resnet_conv2_bn
-                resnet2_conv2_bn = tf.nn.relu(resnet2_conv2_bn)
+            resnet2_conv2_bn = tf.layers.batch_normalization(resnet2_conv2)
+            resnet2_conv2_bn = tf.nn.relu(resnet2_conv2_bn)
 
-                deconv3 = tf.layers.conv2d_transpose(inputs=resnet2_conv2_bn, filters=128, kernel_size=(3, 3),
-                                                     padding='same',
-                                                     activation=tf.nn.leaky_relu,
-                                                     kernel_initializer=tf.contrib.layers.xavier_initializer())
+            resnet2_conv2_bn += resnet_conv2_bn
+            resnet2_conv2_bn = tf.nn.relu(resnet2_conv2_bn)
+
+            deconv3 = tf.layers.conv2d_transpose(inputs=resnet2_conv2_bn, filters=128, kernel_size=(3, 3),
+                                                 padding='same',
+                                                 activation=tf.nn.leaky_relu,
+                                                 kernel_initializer=tf.contrib.layers.xavier_initializer())
 
             # small gen end
 
@@ -464,9 +464,5 @@ class Multi_Generator2():
                                                 activation=tf.nn.leaky_relu,
                                                 kernel_initializer=tf.contrib.layers.xavier_initializer())
 
-            deconv_small = tf.layers.conv2d_transpose(inputs=deconv3, filters=3, kernel_size=(3, 3), padding='same',
-                                                 activation=tf.nn.leaky_relu,
-                                                 kernel_initializer=tf.contrib.layers.xavier_initializer())
 
-
-        return deconv0, deconv_small
+        return deconv0

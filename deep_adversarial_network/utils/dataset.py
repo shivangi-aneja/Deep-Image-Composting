@@ -111,4 +111,4 @@ class BIG_DATA(BaseDataset):
         return 2
 
 
-DATASETS = {"mnist", "toy", "big"}
+DATASETS = { "toy", "big"}

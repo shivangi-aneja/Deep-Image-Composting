@@ -1,68 +1,122 @@
-# adl4cv_practikum
-Advanced Deep Learning Practical Course
+# Advanced Deep Learning Practical Course : Realistic Composite Image Creation Using GANs
 
-## Trello Board
-https://trello.com/b/PMPjHo7Z/adl4cv-practical
+## 1. How To Train the model
 
-## Slack
-https://adl4cv-tum.slack.com
+```bash
+usage: main.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
+               [--n-workers N_WORKERS] [--gpu GPU] [-rs RANDOM_SEED]
+               [-dr DISCRIMINATOR] [-gr GENERATOR]  [-d_lr D_LR]  [-g_lr G_LR]
+               [-b BATCH_SIZE] [-d_opt D_OPTIM]  [-g_opt G_OPTIM]
+               [-m MODEL_NAME] [-e EPOCHS]   [-rl RECON_LOSS]
+               [-tf TF_LOGS]  [-mp PLOT_MATPLOTLIB]
 
-## 1. Python Setup
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DATASET, --dataset DATASET
+                        dataset, {'big'} (default: big)
+  --data-dirpath DATA_DIRPATH
+                        directory for storing downloaded data (default: data/)
+  --n-workers N_WORKERS
+                        how many threads to use for I/O (default: 2)
+  --gpu GPU             ID of the GPU to train on (or '' to train on CPU)
+                        (default: 0)
+  -rs RANDOM_SEED, --random-seed RANDOM_SEED
+                        random seed for training (default: 1)
+  --dr DISCRIMINATOR, --discriminator DISCRIMINATOR
+                        discriminator architecture name, {'test_discriminator1', 'resnet', 'patch'}
+                        (default: patch)
+  --gr GENERATOR, --generator GENERATOR
+                        generator architecture name, {'test_generator1', 'skip1', 'skip2', 'multi1', 'multi2'}
+                        (default: skip2)
+  -d_lr D_LR, --d_lr D_LR
+                        discriminator learning rate (default: 0.0001)
+  -g_lr G_LR, --g_lr G_LR
+                        generator learning rate (default: 0.0001)
+  -b BATCH_SIZE, --batch-size BATCH_SIZE
+                        input batch size for training (default: 16)
+  -d_opt D_OPTIM, --d_optim D_OPTIM
+                        optimizer, {'adam', 'sgd', 'adagrad', 'rms_prop'} (default: adam)
+  -g_opt G_OPTIM, --g_optim G_OPTIM
+                        optimizer, {'adam', 'sgd', 'adagrad', 'rms_prop'} (default: adam)
+  -m MODEL_NAME, --model_name MODEL_NAME
+                        name of model (default: 'gan_model')
+  -e EPOCHS, --epochs EPOCHS
+                        number of epochs (default: 1000)
+  -rl RECON_LOSS, --recon_loss RECON_LOSS
+                        loss function, {'l1','l2'} (default: l1)
+  -tf TF_LOGS, --tf_logs TF_LOGS
+                        folder for tensorflow logging
+  -mp PLOT_MATPLOTLIB, --plot_matplotlib PLOT_MATPLOTLIB
+                        whether to plot matplotlib
+```
 
-Prerequisites:
-- Unix system (Linux or MacOS)
-- Python version 3
-- Integrated development environment (IDE) (e.g. PyCharm or Sublime Text)
+### Sample Command for training
+```bash
+python main.py -b 5 --gpu 1 -d_lr 1e-7 -g_lr 1e-5 -m pix2pix_patch_hue_total -e 1000 -tf tf_logs/pix2pix_patch_hue_total -rl l1 -dr patch -gr skip2
+```
 
-`which virtualenv`
+## 2. How To generate results on the model
 
-to point to the installed location.
+```bash
+usage: main.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
+               [--n-workers N_WORKERS] [--gpu GPU] [-rs RANDOM_SEED]
+               [-dr DISCRIMINATOR] [-gr GENERATOR]  [-d_lr D_LR]  [-g_lr G_LR]
+               [-b BATCH_SIZE] [-d_opt D_OPTIM]  [-g_opt G_OPTIM]
+               [-m MODEL_NAME] [-e EPOCHS]   [-rl RECON_LOSS]
+               [-tf TF_LOGS]  [-mp PLOT_MATPLOTLIB]
 
-Also, installing with pip should work (the *virtualenv* executable should be added to your search path automatically):
+optional arguments:
+  -h, --help    show this help message and exit
+  -d DATASET, --dataset DATASET
+                        dataset, {'big'} (default: big)
+  --data-dirpath DATA_DIRPATH
+                        directory for storing downloaded data (default: data/)
+  --n-workers N_WORKERS
+                        how many threads to use for I/O (default: 2)
+  --gpu GPU             ID of the GPU to train on (or '' to train on CPU)
+                        (default: 0)
+  -rs RANDOM_SEED, --random-seed RANDOM_SEED
+                        random seed for training (default: 1)
+  --dr DISCRIMINATOR, --discriminator DISCRIMINATOR
+                        discriminator architecture name, {'test_discriminator1', 'resnet', 'patch'}
+                        (default: patch)
+  --gr GENERATOR, --generator GENERATOR
+                        generator architecture name, {'test_generator1', 'skip1', 'skip2', 'multi1', 'multi2'}
+                        (default: skip2)
+  -d_lr D_LR, --d_lr D_LR
+                        discriminator learning rate (default: 0.0001)
+  -g_lr G_LR, --g_lr G_LR
+                        generator learning rate (default: 0.0001)
+  -b BATCH_SIZE, --batch-size BATCH_SIZE
+                        input batch size for training (default: 16)
+  -d_opt D_OPTIM, --d_optim D_OPTIM
+                        optimizer, {'adam', 'sgd', 'adagrad', 'rms_prop'} (default: adam)
+  -g_opt G_OPTIM, --g_optim G_OPTIM
+                        optimizer, {'adam', 'sgd', 'adagrad', 'rms_prop'} (default: adam)
+  -m MODEL_NAME, --model_name MODEL_NAME
+                        name of model (default: 'gan_model')
+  -e EPOCHS, --epochs EPOCHS
+                        number of epochs (default: 1000)
+  -rl RECON_LOSS, --recon_loss RECON_LOSS
+                        loss function, {'l1','l2'} (default: l1)
+  -tf TF_LOGS, --tf_logs TF_LOGS
+                        folder for tensorflow logging
+  -mp PLOT_MATPLOTLIB, --plot_matplotlib PLOT_MATPLOTLIB
+                        whether to plot matplotlib
 
-`pip3 install virtualenv`
+### Sample Command for testing
+```bash
+python evaluate_models.py -b 5 --gpu 1 -d_lr 1e-7 -g_lr 1e-5 -m pix2pix_patch_hue_total -rl l1 -dr patch -gr skip2
+```
 
-Execute
-`virtualenv -p python3 --no-site-packages venv`
+## Trained Models
+No pretrained models were used. Everything is trained from scratch.
+All the trained models can be downloaded [here](https://drive.google.com/file/d/1Fb9XrDYKtzJiysEi79dC_NZlsrgUr-9o/view?usp=sharing).
 
-Basically, this installs a sandboxed Python in the directory `svenv`. The
-additional argument ensures that sandboxed packages are used even if they had
-already been installed globally before.
+## Documents
+The reports and presentations can be found in `docs` directory.
 
-Whenever you want to use this *virtualenv* in a shell you have to first
-activate it by calling:
 
-`source venv/bin/activate`
-
-To test whether your *virtualenv* activation has worked, call:
-
-`which python`
-
-This should now point to `.venv/bin/python`.
-
-Installing required packages:
-
-`pip3 install -r requirements.txt`
-
-## 2. Tensorflow
-
-### (Current release for CPU-only)
-`pip install tensorflow`
-
-`pip install tensorboard`
-
-### GPU package for CUDA-enabled GPU cards
-`pip install tensorflow-gpu`
-
-`pip install tensorboard`
-
-## 3. Pytorch
-
-### Install pytorch (MAC CPU-only / Linux GPU Cuda 9.0)
-`pip3 install torch torchvision`
-
-### Install IPython
-`pip install Ipython`
-
-### Install Tensorboard for pytorch
-`pip3 install tensorboard-pytorch --no-cache-dir`
+## Results
+The dataset can be downloaded [here] ().
+The generated results can be downloaded here [here]().

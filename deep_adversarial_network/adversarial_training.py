@@ -1,11 +1,12 @@
 import os
 import pickle
 import time
-import tensorflow as tf
+
 import matplotlib.pyplot as plt
-from deep_adversarial_network.losses.custom_losses import perceptual_loss, rgb_loss, hsv_loss
+
 from deep_adversarial_network.logging.logger import rootLogger
 from deep_adversarial_network.logging.tf_logger import Logger
+from deep_adversarial_network.losses.custom_losses import perceptual_loss, rgb_loss, hsv_loss
 from deep_adversarial_network.metrics.metric_eval import *
 from deep_adversarial_network.metrics.metric_eval import (d_accuracy)
 from deep_adversarial_network.utils.common_util import *
@@ -47,7 +48,6 @@ class DeepGAN(object):
         # Tensorboard Logging
         self.logger = Logger(model_name=self.model_name, data_name=self.dataset, log_path=tf_log_path)
 
-
     def adversarial_train(self, train_loader, test_loader, model_path):
         """
         Function for adversarial training
@@ -63,19 +63,19 @@ class DeepGAN(object):
         # variables : input
         comp_img = tf.placeholder(tf.float32, shape=(None, 200, 300, 3))
         gt_img = tf.placeholder(tf.float32, shape=(None, 200, 300, 3))
-        # z = tf.placeholder(tf.float32, shape=(None, 32,32,3))
         isTrain = tf.placeholder(dtype=tf.bool)
 
         # networks : generator
         G_z = self.generator.make_generator_network(comp_img, reuse=False, isTrain=isTrain)
 
-        # networks : discriminator
-        #D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
-        #D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
+        # network for : Resnet Discriminator
+        # D_real, D_real_logits = self.discriminator.make_discriminator_network(gt_img, isTrain=isTrain)
+        # D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
 
-        #network: Patch Discriminator
-        D_real, D_real_logits = self.discriminator.make_discriminator_network(comp_img,gt_img, isTrain=isTrain)
-        D_fake, D_fake_logits = self.discriminator.make_discriminator_network(comp_img, G_z, reuse=True, isTrain=isTrain)
+        # network for : Patch Discriminator
+        D_real, D_real_logits = self.discriminator.make_discriminator_network(comp_img, gt_img, isTrain=isTrain)
+        D_fake, D_fake_logits = self.discriminator.make_discriminator_network(comp_img, G_z, reuse=True,
+                                                                              isTrain=isTrain)
 
         # loss for each network
         D_loss_real = tf.reduce_mean(
@@ -85,14 +85,14 @@ class DeepGAN(object):
         D_loss = D_loss_real + D_loss_fake
 
         G_loss1 = tf.reduce_mean(self.recon_loss(gt_img, G_z))
-        G_loss2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+        G_loss2 = tf.reduce_mean(
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
 
         G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
-        G_rgb_loss =  rgb_loss(self.recon_loss,G_z ,gt_img)
+        G_rgb_loss = rgb_loss(self.recon_loss, G_z, gt_img)
         G_hsv_loss = hsv_loss(ground_truth=gt_img, predicted=G_z)
-        G_loss = G_loss2 + 50 * G_loss1 + 100 * G_perceptual_loss + 0*G_rgb_loss + 150 * G_hsv_loss
-        G_loss /=1000
-
+        G_loss = G_loss2 + 50 * G_loss1 + 100 * G_perceptual_loss + 0 * G_rgb_loss + 150 * G_hsv_loss
+        G_loss /= 1000
 
         # trainable variables for each network
         T_vars = tf.trainable_variables()
@@ -156,7 +156,8 @@ class DeepGAN(object):
                 G_losses.append(loss_g_)
 
             # Log the training losses
-            self.logger.log(mode="train", d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch + 1, n_batch=0,
+            self.logger.log(mode="train", d_error=np.mean(D_losses), g_error=np.mean(G_losses), epoch=epoch + 1,
+                            n_batch=0,
                             num_batches=1)
 
             epoch_end_time = time.time()
@@ -168,7 +169,8 @@ class DeepGAN(object):
             # Evaluate the model after every epoch
             self.evaluate_test_data(num_epoch=(epoch + 1), test_loader=test_loader, G_z=G_z, D_fake=D_fake,
                                     D_fake_logits=D_fake_logits, D_real=D_real, D_real_logits=D_real_logits,
-                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img, gt_img=gt_img,
+                                    D_loss=D_loss, G_loss=G_loss, D_optim=D_optim, G_optim=G_optim, comp_img=comp_img,
+                                    gt_img=gt_img,
                                     isTrain=isTrain, show=False, save=True, path=fixed_p)
 
             # Save the model after every 10 epochs
@@ -188,9 +190,10 @@ class DeepGAN(object):
         total_ptime = end_time - start_time
         train_hist['total_ptime'].append(total_ptime)
         rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (
-        np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+            np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
 
-        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
+        rootLogger.info('Avg per epoch ptime: %.2f, total %d epochs ptime: %.2f' % (
+        np.mean(train_hist['per_epoch_ptimes']), self.epochs, total_ptime))
         rootLogger.info("Training finish!!!...")
 
         if self.mplib:
@@ -265,12 +268,15 @@ class DeepGAN(object):
             mse_avg_total += mse_avg_iter
             psnr_avg_total += psnr_avg_iter
 
-            #D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
-            #D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: test_images, isTrain: False})
+            # resnet discriminator
+            # D_real_prob, _ = self.sess.run([D_real, D_real_logits], {gt_img: gt_image, isTrain: False})
+            # D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {G_z: test_images, isTrain: False})
 
-            #patch GAN
-            D_real_prob, _ = self.sess.run([D_real, D_real_logits], {comp_img:comp_image, gt_img: gt_image, isTrain: False})
-            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits], {comp_img:comp_image, G_z: test_images, isTrain: False})
+            # patch GAN
+            D_real_prob, _ = self.sess.run([D_real, D_real_logits],
+                                           {comp_img: comp_image, gt_img: gt_image, isTrain: False})
+            D_fake_prob, _ = self.sess.run([D_fake, D_fake_logits],
+                                           {comp_img: comp_image, G_z: test_images, isTrain: False})
 
             Disc_accuracy = d_accuracy(D_real_prob, D_fake_prob)
             Disc_accuracy_total += Disc_accuracy
@@ -279,15 +285,16 @@ class DeepGAN(object):
             val_D_losses.append(val_loss_d_)
 
             # update generator
-            val_loss_g_, _ = self.sess.run([G_loss,G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
+            val_loss_g_, _ = self.sess.run([G_loss, G_optim], {comp_img: comp_image, gt_img: gt_image, isTrain: False})
             val_G_losses.append(val_loss_g_)
 
-            if iter == len(test_loader)-1:
+            if iter == len(test_loader) - 1:
                 self.logger.log_images(mode='composite', images=np.array(comp_image), num_images=len(comp_image),
                                        epoch=num_epoch, n_batch=iter,
                                        num_batches=len(test_loader), normalize=True)
 
-                self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images), epoch=num_epoch,
+                self.logger.log_images(mode='generated', images=test_images, num_images=len(test_images),
+                                       epoch=num_epoch,
                                        n_batch=iter,
                                        num_batches=len(test_loader), normalize=True)
 
@@ -300,12 +307,14 @@ class DeepGAN(object):
         Disc_accuracy_total /= num_iter
 
         rootLogger.info("Epoch %d  MSE = [%.4f]    PSNR = [%.4f]  Disc_Acc = [%.4f] loss_d= [%.3f], loss_g= [%.3f]" % (
-        num_epoch, mse_avg_total, psnr_avg_total, Disc_accuracy_total, np.mean(val_D_losses), np.mean(val_G_losses)))
-        self.logger.log_scores(mode="val",mse=mse_avg_total, psnr=psnr_avg_total, disc_acc=Disc_accuracy_total, epoch=num_epoch)
+            num_epoch, mse_avg_total, psnr_avg_total, Disc_accuracy_total, np.mean(val_D_losses),
+            np.mean(val_G_losses)))
+        self.logger.log_scores(mode="val", mse=mse_avg_total, psnr=psnr_avg_total, disc_acc=Disc_accuracy_total,
+                               epoch=num_epoch)
 
-        self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch, n_batch=0,
+        self.logger.log(mode="val", d_error=np.mean(val_D_losses), g_error=np.mean(val_G_losses), epoch=num_epoch,
+                        n_batch=0,
                         num_batches=1)
-
 
     def validate_results(self, test_loader, model_path, image_path_gt, image_path_pred, image_path_comp):
         """
@@ -361,7 +370,7 @@ class DeepGAN(object):
             psnr_avg_total += psnr_avg_iter
             tv_avg_total += tv_avg_iter
             ssim_avg_total += ssim_avg_iter
-            vif_avg_total +=vif_avg_iter
+            vif_avg_total += vif_avg_iter
 
             # Save the predicted masks
             ctr = iter * self.batch_size
@@ -369,12 +378,11 @@ class DeepGAN(object):
             save_image(tf.convert_to_tensor(gt_image), image_path=image_path_gt, file_num=ctr, mode='gt')
             save_image(tf.convert_to_tensor(comp_image), image_path=image_path_comp, file_num=ctr, mode='comp')
 
-
         mse_avg_total /= num_iter
         psnr_avg_total /= num_iter
         tv_avg_total /= num_iter
         ssim_avg_total /= num_iter
-        vif_avg_total /=num_iter
+        vif_avg_total /= num_iter
 
-        rootLogger.info("MSE : %.3f, PSNR : %.3f, TV : %.3f  SSIM : %.3f  VIF: %3F"% (mse_avg_total, psnr_avg_total, tv_avg_total, ssim_avg_total, vif_avg_total))
-
+        rootLogger.info("MSE : %.3f, PSNR : %.3f, TV : %.3f  SSIM : %.3f  VIF: %3F" % (
+        mse_avg_total, psnr_avg_total, tv_avg_total, ssim_avg_total, vif_avg_total))

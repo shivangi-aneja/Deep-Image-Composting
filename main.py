@@ -74,7 +74,7 @@ parser.add_argument('-d_lr', '--d_lr', type=float, default=1e-4,
 parser.add_argument('-g_lr', '--g_lr', type=float, default=1e-4,
                     help='generator learning rate')
 
-parser.add_argument('-b', '--batch_size', type=int, default=2,
+parser.add_argument('-b', '--batch_size', type=int, default=16,
                     help='input batch size for training')
 
 parser.add_argument('-d_opt', '--d_optim', type=str, default='adam',

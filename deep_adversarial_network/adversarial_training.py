@@ -74,6 +74,7 @@ class DeepGAN(object):
         #D_fake, D_fake_logits = self.discriminator.make_discriminator_network(G_z, reuse=True, isTrain=isTrain)
 
         #network: Patch Discriminator
+        gt_img = tf.image.resize_images(gt_img, [99, 149], align_corners=True)
         D_real, D_real_logits = self.discriminator.make_discriminator_network(comp_img,gt_img, isTrain=isTrain)
         D_fake, D_fake_logits = self.discriminator.make_discriminator_network(comp_img, G_z, reuse=True, isTrain=isTrain)
 

@@ -469,4 +469,4 @@ class Multi_Generator2():
                                                  kernel_initializer=tf.contrib.layers.xavier_initializer())
 
 
-        return deconv0
+        return deconv_small

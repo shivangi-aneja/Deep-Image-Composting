@@ -85,13 +85,13 @@ class DeepGAN(object):
         D_loss = D_loss_real + D_loss_fake
 
         G_loss1 = tf.reduce_mean(self.recon_loss(gt_img, G_z))
-        G_loss2 = tf.reduce_mean(
-            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+        G_loss2 = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
 
         G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
         G_rgb_loss =  rgb_loss(self.recon_loss,G_z ,gt_img)
         G_hsv_loss = hsv_loss(ground_truth=gt_img, predicted=G_z)
-        G_loss = G_loss2 + 0 * G_loss1 + 0 * G_perceptual_loss + 0*G_rgb_loss + 1 * G_hsv_loss
+        G_loss = G_loss2 + 50 * G_loss1 + 100 * G_perceptual_loss + 0*G_rgb_loss + 150 * G_hsv_loss
+        G_loss /=1000
 
 
         # trainable variables for each network

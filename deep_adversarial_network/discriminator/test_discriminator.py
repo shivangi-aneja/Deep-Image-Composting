@@ -137,7 +137,6 @@ class Patch_Discriminator(object):
 
     def make_discriminator_network(self, discrim_inputs, discrim_targets , reuse=False, isTrain=True):
         with tf.variable_scope("discriminator", reuse=reuse):
-            # input = tf.placeholder(tf.float32, (None, 16, 16, 3), name="input")
             discrim_inputs = tf.image.resize_images(discrim_inputs, (256, 256))
             discrim_targets = tf.image.resize_images(discrim_targets, (256,256))
             x = tf.concat([discrim_inputs, discrim_targets], axis=3)

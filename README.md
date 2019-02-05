@@ -1,6 +1,6 @@
 # Advanced Deep Learning Practical Course : Realistic Composite Image Creation Using GANs
 
-## 1. How To Train the model
+## 1. How To train the model
 
 ```bash
 usage: main.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
@@ -58,7 +58,7 @@ python main.py -b 5 --gpu 1 -d_lr 1e-7 -g_lr 1e-5 -m pix2pix_patch_hue_total -e 
 ## 2. How To generate results on the model
 
 ```bash
-usage: main.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
+usage: evaluate_models.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
                [--n-workers N_WORKERS] [--gpu GPU] [-rs RANDOM_SEED]
                [-dr DISCRIMINATOR] [-gr GENERATOR]  [-d_lr D_LR]  [-g_lr G_LR]
                [-b BATCH_SIZE] [-d_opt D_OPTIM]  [-g_opt G_OPTIM]
@@ -103,7 +103,7 @@ optional arguments:
                         folder for tensorflow logging
   -mp PLOT_MATPLOTLIB, --plot_matplotlib PLOT_MATPLOTLIB
                         whether to plot matplotlib
-
+```
 ### Sample Command for testing
 ```bash
 python evaluate_models.py -b 5 --gpu 1 -d_lr 1e-7 -g_lr 1e-5 -m pix2pix_patch_hue_total -rl l1 -dr patch -gr skip2
@@ -111,12 +111,13 @@ python evaluate_models.py -b 5 --gpu 1 -d_lr 1e-7 -g_lr 1e-5 -m pix2pix_patch_hu
 
 ## Trained Models
 No pretrained models were used. Everything is trained from scratch.
-All the trained models can be downloaded [here](https://drive.google.com/file/d/1Fb9XrDYKtzJiysEi79dC_NZlsrgUr-9o/view?usp=sharing).
+The trained model with Patch GAN can be downloaded [here](https://drive.google.com/file/d/1ioigvoe34oFKFcxFg32gkJsbwvRCnBpJ/view?usp=sharing).
 
 ## Documents
 The reports and presentations can be found in `docs` directory.
 
 
-## Results
-The dataset can be downloaded [here] ().
-The generated results can be downloaded here [here]().
+## Downloads
+The dataset can be downloaded [here] (https://drive.google.com/file/d/1VG6U_zw8dFPlreq5toAgzE6xD2uDkbFC/view?usp=sharing).
+The generated results can be downloaded [here](https://drive.google.com/file/d/1IwQ1FiVxQBWDu1p2_bNlEr94Peo-pVYK/view?usp=sharing). The directory `pred` contains generated images, `gt` contains ground truth and `comp` contains composite images.
+The `.npy` file for evaluation can be downloaded [here] (https://drive.google.com/file/d/1pH0H0R29AWe9OkXplx0yEHyA0JiOIBhA/view?usp=sharing).

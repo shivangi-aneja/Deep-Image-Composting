@@ -161,9 +161,9 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
 
 <table>
   <tr>
-    <td width="35%">Composite</td>
-    <td width="35%">Deep Image </td>
-    <td width="35%">Predicted </td>
-    <td width="35%">Ours </td>
+    <td width="30%">Composite</td>
+    <td width="30%">Deep Image </td>
+    <td width="30%">Predicted </td>
+    <td width="30%">Ours </td>
   </tr>
   <tr>

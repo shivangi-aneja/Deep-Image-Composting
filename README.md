@@ -158,19 +158,4 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
   <img src="/images/pred_149.png" width="23%" />
   <img src="/images/gt_149.png" width="23%" />
 </p>
-
-
-<div style="-webkit-column-count: 3; -moz-column-count: 3; column-count: 3; -webkit-column-rule: 1px dotted #e0e0e0; -moz-column-rule: 1px dotted #e0e0e0; column-rule: 1px dotted #e0e0e0;">
-    <div style="display: inline-block;">
-        Composite
-    </div>
-    <div style="display: inline-block;">
-       Deep Image
-    </div>
-    <div style="display: inline-block;">
-       Predicted
-    </div>
-    <div style="display: inline-block;">
-       Ours
-    </div>
-</div>
+| Composite    | Deep Image | Predicted | Ours

@@ -86,7 +86,7 @@ class DeepGAN(object):
 
         G_loss1 = tf.reduce_mean(self.recon_loss(gt_img, G_z))
         G_loss2 = tf.reduce_mean(
-            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.zeros_like(D_fake_logits)))
+            tf.nn.sigmoid_cross_entropy_with_logits(logits=D_fake_logits, labels=tf.ones_like(D_fake_logits)))
 
         G_perceptual_loss = perceptual_loss(self.batch_size, G_z, gt_img)
         G_rgb_loss = rgb_loss(self.recon_loss, G_z, gt_img)

@@ -121,3 +121,12 @@ The reports and presentations can be found in `docs` directory.
 The dataset can be downloaded [here](https://drive.google.com/file/d/1VG6U_zw8dFPlreq5toAgzE6xD2uDkbFC/view?usp=sharing).
 The generated results can be downloaded [here](https://drive.google.com/file/d/1IwQ1FiVxQBWDu1p2_bNlEr94Peo-pVYK/view?usp=sharing). The directory `pred` contains generated images, `gt` contains ground truth and `comp` contains composite images.
 The `.npy` file for evaluation can be downloaded [here](https://drive.google.com/file/d/1pH0H0R29AWe9OkXplx0yEHyA0JiOIBhA/view?usp=sharing).
+
+
+## Results
+<p float="left">
+  <img src="/images/comp_4.png" width="20%" />
+  <img src="/images/ht_4.png" width="20%" />
+  <img src="/images/pred_4.png" width="20%" />
+  <img src="/images/gt_4.png" width="20%" />
+</p>

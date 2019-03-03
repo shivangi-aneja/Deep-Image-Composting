@@ -158,7 +158,7 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
   <img src="/images/pred_149.png" width="23%" />
   <img src="/images/gt_149.png" width="23%" />
 </p>
-
+|   Composite   |   Deep Image    |     Predicted     |     Ours    |
 <table>
   <tr>
     <td width="30%">Composite</td>

@@ -125,8 +125,8 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
 
 ## Results
 <p float="left">
-  <img src="/images/comp_4.png" width="20%" />
-  <img src="/images/ht_4.png" width="20%" />
-  <img src="/images/pred_4.png" width="20%" />
-  <img src="/images/gt_4.png" width="20%" />
+  <img src="/images/comp_4.png" width="30%" />
+  <img src="/images/ht_4.png" width="30%" />
+  <img src="/images/pred_4.png" width="30%" />
+  <img src="/images/gt_4.png" width="30%" />
 </p>

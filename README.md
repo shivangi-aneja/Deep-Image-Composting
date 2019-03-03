@@ -130,3 +130,31 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
   <img src="/images/pred_4.png" width="30%" />
   <img src="/images/gt_4.png" width="30%" />
 </p>
+
+<p float="left">
+  <img src="/images/comp_36.png" width="30%" />
+  <img src="/images/ht_36.png" width="30%" />
+  <img src="/images/pred_36.png" width="30%" />
+  <img src="/images/gt_36.png" width="30%" />
+</p>
+
+<p float="left">
+  <img src="/images/comp_39.png" width="30%" />
+  <img src="/images/ht_39.png" width="30%" />
+  <img src="/images/pred_39.png" width="30%" />
+  <img src="/images/gt_39.png" width="30%" />
+</p>
+
+<p float="left">
+  <img src="/images/comp_121.png" width="30%" />
+  <img src="/images/ht_121.png" width="30%" />
+  <img src="/images/pred_121.png" width="30%" />
+  <img src="/images/gt_121.png" width="30%" />
+</p>
+
+<p float="left">
+  <img src="/images/comp_149.png" width="30%" />
+  <img src="/images/ht_149.png" width="30%" />
+  <img src="/images/pred_149.png" width="30%" />
+  <img src="/images/gt_149.png" width="30%" />
+</p>

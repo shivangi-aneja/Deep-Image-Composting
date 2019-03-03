@@ -158,3 +158,10 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
   <img src="/images/pred_149.png" width="23%" />
   <img src="/images/gt_149.png" width="23%" />
 </p>
+
+<p float="left">
+  <img src="/images/comp_149.png" width="23%" title="Composite Image" />
+  <img src="/images/ht_149.png" width="23%" title="Deep Image Harmonization"/>
+  <img src="/images/pred_149.png" width="23%" title="Predicted (Ours)"/>
+  <img src="/images/gt_149.png" width="23%" title="Ground Truth" />
+</p>

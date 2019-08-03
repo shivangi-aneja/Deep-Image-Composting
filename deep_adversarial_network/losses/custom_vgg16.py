@@ -15,7 +15,7 @@ def loadWeightsData(vgg16_npy_path=None):
         path = os.path.join(path, "vgg16.npy")
         vgg16_npy_path = path
         print (vgg16_npy_path)
-    return np.load(vgg16_npy_path, encoding='latin1').item()
+    return np.load(vgg16_npy_path, encoding='latin1', allow_pickle=True).item()
 
 
 class custom_Vgg16(Vgg16):

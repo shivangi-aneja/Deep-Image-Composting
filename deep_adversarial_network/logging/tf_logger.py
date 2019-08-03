@@ -22,7 +22,7 @@ class Logger:
         self.data_subdir = '{}/{}'.format(model_name, data_name)
 
         # TensorBoard
-        self.writer = SummaryWriter(log_dir=log_path, comment=self.comment)
+        self.writer = SummaryWriter(logdir=log_path, comment=self.comment)
 
     def log(self, mode, d_error, g_error, epoch, n_batch, num_batches):
         """

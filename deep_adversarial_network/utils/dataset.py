@@ -1,12 +1,17 @@
 """
     dataset class for all the datasets
 """
+from torch.utils.data import Dataset
+import PIL.ImageOps
+from torchvision import transforms
+import numpy as np
+import cv2
 import os
 
-import numpy as np
-import torch
-
-from deep_adversarial_network.utils.custom_dataloader import CustomDataset2
+IMG_EXTENSIONS = [
+    '.jpg', '.JPG', '.jpeg', '.JPEG',
+    '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP',
+]
 
 
 def get_available_datasets():
@@ -17,7 +22,7 @@ def get_available_datasets():
     return sorted(DATASETS)
 
 
-def make_dataset(name):
+def make_dataset(name, base_path, transform=None):
     """
     it returns dataset according to its name
     :param name: dataset name
@@ -26,89 +31,84 @@ def make_dataset(name):
     name = name.strip().lower()
     if not name in DATASETS:
         raise ValueError("invalid dataset: '{0}'".format(name))
-    elif name == 'toy':
-        return TOY_DATA()
-    elif name == 'big':
-        return BIG_DATA()
+    else:
+        return CustomDataset(name=name, base_path=base_path, transform=transform)
 
 
-class BaseDataset(object):
+def make_datasets(dir, max_dataset_size=float("inf")):
+    images = []
+    assert os.path.isdir(dir), '%s is not a valid directory' % dir
+
+    for root, _, fnames in sorted(os.walk(dir)):
+        for fname in fnames:
+            if is_image_file(fname):
+                path = os.path.join(root, fname)
+                images.append(path)
+    return images[:min(max_dataset_size, len(images))]
+
+
+def is_image_file(filename):
+    return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
+
+
+class CustomDataset(Dataset):
     """
-    base dataset
+    It requires two directories to host training images from domain A '/path/to/data/trainA'
+    and from domain B '/path/to/data/trainB' respectively.
     """
 
-    def _load(self, dirpath):
-        """Download if needed and return the dataset.
-        Return format is (`torch.Tensor` data, `torch.Tensor` label) iterable
-        of appropriate shape or tuple (train data, test data) of such.
+    def __init__(self, name, base_path, transform=None, should_invert=False):
         """
-        raise NotImplementedError('`load` is not implemented')
-
-    def load(self, dirpath):
+            Initialize this dataset class.
         """
-        loads the dataset
-        :param dirpath: directory path where dataset is stored
-        :return:
+        self.comp = os.path.join(base_path + 'comp')  # create a path '/path/to/data/trainA'
+        self.gt = os.path.join(base_path + 'gt')  # create a path '/path/to/data/trainB'
+        self.comp_paths = sorted(make_datasets(self.comp))  # load images from '/path/to/data/trainA'
+        self.gt_paths = sorted(make_datasets(self.gt))  # load images from '/path/to/data/trainB'
+        self.comp_size = len(self.comp_paths)  # get the size of composite
+        self.gt_size = len(self.gt_paths)  # get the size of ground truth
+        self.transform = transform
+        self.should_invert = should_invert
+        self.to_tensor = transforms.ToTensor()
+
+    def __getitem__(self, index):
+        """Return a data point and its metadata information.
+        Parameters:
+            index (int)      -- a random integer for data indexing
+        Returns a dictionary that contains A, B, A_paths and B_paths
+            comp (tensor)     -- composite image
+            gt (tensor)       -- ground truth image
         """
-        return self._load(os.path.join(dirpath, self.__class__.__name__.lower()))
+        comp_path = self.comp_paths[index % self.comp_size]  # make sure index is within then range
+        gt_path = self.gt_paths[index % self.gt_size]
 
-    def n_classes(self):
-        """Get number of classes."""
-        raise NotImplementedError('`n_classes` is not implemented')
+        comp_img = cv2.imread(comp_path)
+        comp_img = np.array(comp_img, dtype='uint8')
+        comp_img = cv2.cvtColor(comp_img, cv2.COLOR_BGR2RGB)
 
+        gt_img = cv2.imread(gt_path)
+        gt_img = np.array(gt_img, dtype='uint8')
+        gt_img = cv2.cvtColor(gt_img, cv2.COLOR_BGR2RGB)
 
-class TOY_DATA(BaseDataset):
-    """
-    TOY_DATA dataset
-    """
+        if self.should_invert:
+            comp_img = PIL.ImageOps.invert(comp_img)
+            gt_img = PIL.ImageOps.invert(gt_img)
 
-    def __init__(self):
-        super(BaseDataset, self).__init__()
+        if self.transform is not None:
+            comp_img_as_tensor = self.transform(comp_img)
+            gt_img_as_tensor = self.transform(gt_img)
+        else:
+            comp_img_as_tensor = self.to_tensor(comp_img)
+            gt_img_as_tensor = self.to_tensor(gt_img)
 
-    def _load(self, dirpath):
-        # Training images
-        image_tuple = np.load(dirpath + '/toy_data.npy')
+        return comp_img_as_tensor, gt_img_as_tensor
 
-        train_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:1000]])
-        val_data = torch.stack([torch.Tensor(i) for i in image_tuple[0:5]])
-
-        # train = CustomDataset1(comp_image=train_data[:,0,:,:], fg_img=train_data[:,1,:,:],
-        #                       alpha=train_data[:,2,:,:], bg_img=train_data[:,3,:,:])
-        # val = CustomDataset1(comp_image=val_data[:, 0, :, :], fg_img=val_data[:, 1, :, :],
-        #                       alpha=val_data[:, 2, :, :], bg_img=val_data[:, 3, :, :])
-
-        train = CustomDataset2(comp_image=train_data[:, 0, :, :], gt_img=train_data[:, 1, :, :])
-        val = CustomDataset2(comp_image=val_data[:, 0, :, :], gt_img=val_data[:, 1, :, :])
-        return train, val
-
-    def n_classes(self):
-        # In segmentation n_classes = 2 (One foreground, other background)
-        return 2
+    def __len__(self):
+        """Return the total number of images in the dataset.
+        As we have two datasets with potentially different number of images,
+        we take a maximum of
+        """
+        return max(self.comp_size, self.gt_size)
 
 
-class BIG_DATA(BaseDataset):
-    """
-    BIG_DATA dataset
-    """
-
-    def __init__(self):
-        super(BaseDataset, self).__init__()
-
-    def _load(self, dirpath):
-        # Training images
-        train_tuple = np.load(dirpath + '/train.npy')
-        val_tuple = np.load(dirpath + '/val.npy')
-
-        train_data = torch.stack([torch.Tensor(i) for i in train_tuple])
-        val_data = torch.stack([torch.Tensor(i) for i in val_tuple])
-
-        train = CustomDataset2(comp_image=train_data[:, 0, :, :], gt_img=train_data[:, 1, :, :])
-        val = CustomDataset2(comp_image=val_data[:, 0, :, :], gt_img=val_data[:, 1, :, :])
-        return train, val
-
-    def n_classes(self):
-        # In segmentation n_classes = 2 (One foreground, other background)
-        return 2
-
-
-DATASETS = { "toy", "big"}
+DATASETS = {"coseg"}

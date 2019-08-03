@@ -6,17 +6,16 @@
 
 import argparse
 import os
-
 import tensorflow as tf
 from torch.utils.data import DataLoader
-
+from torchvision import transforms
 from deep_adversarial_network.adversarial_training import DeepGAN
 from deep_adversarial_network.discriminator import (get_available_discriminators, make_discriminator)
 from deep_adversarial_network.generator import (get_available_generators, make_generator)
 from deep_adversarial_network.logging.logger import rootLogger
 from deep_adversarial_network.utils import (get_available_datasets,
-                                            make_dataset, RNG)
-from deep_adversarial_network.utils.pytorch_dataset_utils import DatasetIndexer
+                                            make_dataset)
+
 
 # Optimizers
 OPTIMIZERS = {
@@ -41,7 +40,7 @@ MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 # general
-parser.add_argument('-d', '--dataset', type=str, default='big',
+parser.add_argument('-d', '--dataset', type=str, default='coseg',
                     help="dataset, {'" + \
                          "', '".join(get_available_datasets()) + \
                          "'}")
@@ -58,7 +57,7 @@ parser.add_argument('-rs', '--random-seed', type=int, default=1,
                     help="random seed for training")
 
 # GAN-related
-parser.add_argument('-dr', '--discriminator', type=str, default='resnet',
+parser.add_argument('-dr', '--discriminator', type=str, default='patch',
                     help="discriminator architecture name, {'" + \
                          "', '".join(get_available_discriminators()) + \
                          "'}")
@@ -124,33 +123,29 @@ def main(args=args):
     :param args: arguments related
     :return: None
     """
-
-    # load and shuffle data
-    dataset = make_dataset(args.dataset)
-    train_dataset, val_dataset = dataset.load(args.data_dirpath)
-
-    rng = RNG(args.random_seed)
-    train_ind = rng.permutation(len(train_dataset))
-    val_ind = rng.permutation(len(val_dataset))
-
-    train_dataset = DatasetIndexer(train_dataset, train_ind)
-    val_dataset = DatasetIndexer(val_dataset, val_ind)
-
     batch_size = args.batch_size
     mplib = True if args.plot_matplotlib == 'y' else False
 
-    recon_loss = LOSSES.get(args.recon_loss, None)
-    if not recon_loss:
-        raise ValueError("invalid loss: '{0}'".format(args.recon_loss))
-
+    # load and shuffle data
+    train_dataset = make_dataset(name=args.dataset, base_path=os.getcwd() + '/data/' + args.dataset + '/train/',
+                                 transform=transforms.Compose(
+                                     [transforms.ToPILImage(), transforms.RandomHorizontalFlip(),
+                                      transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]))
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,
                               shuffle=True,
                               num_workers=args.n_workers)
+    val_dataset = make_dataset(name=args.dataset, base_path=os.getcwd() + '/data/' + args.dataset + '/val/',
+                               transform=transforms.Compose(
+                                   [transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]))
     val_loader = DataLoader(dataset=val_dataset,
                             batch_size=batch_size,
-                            shuffle=True,
+                            shuffle=False,
                             num_workers=args.n_workers)
+
+    recon_loss = LOSSES.get(args.recon_loss, None)
+    if not recon_loss:
+        raise ValueError("invalid loss: '{0}'".format(args.recon_loss))
 
     tf_log_path = os.path.join(os.getcwd(), args.tf_logs + '/')
 

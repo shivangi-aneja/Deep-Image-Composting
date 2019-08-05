@@ -10,3 +10,5 @@ models/*
 data.zip
 runs/*
 deep_adversarial_network/weights/*
+voc/*
+msrc/*

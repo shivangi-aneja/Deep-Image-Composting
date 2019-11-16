@@ -1,6 +1,6 @@
 # Deep Image Compositing : Realistic Composite Image Creation Using GANs
 
-This work has been accepted at 3rd BAI Workshop, NeurIPS Conference 2019. Find the attached poster (here)[https://www.academia.edu/40947406/Deep_Image_Compositing].
+This work has been accepted at 3rd BAI Workshop, NeurIPS Conference 2019. Find the attached poster [here](https://www.academia.edu/40947406/Deep_Image_Compositing).
 
 ## 1. How To train the model
 

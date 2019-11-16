@@ -1,8 +1,10 @@
-# Advanced Deep Learning Practical Course : Realistic Composite Image Creation Using GANs
+# Deep Image Compositing : Realistic Composite Image Creation Using GANs
+
+This work has been accepted at 3rd BAI Workshop, NeurIPS Conference 2019. Find the attached poster (here)[https://www.academia.edu/40947406/Deep_Image_Compositing].
 
 ## 1. How To train the model
 
-```bash
+```
 usage: main.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
                [--n-workers N_WORKERS] [--gpu GPU] [-rs RANDOM_SEED]
                [-dr DISCRIMINATOR] [-gr GENERATOR]  [-d_lr D_LR]  [-g_lr G_LR]
@@ -51,13 +53,13 @@ optional arguments:
 ```
 
 ### Sample Command for training
-```bash
+```
 python main.py -b 5 --gpu 1 -d_lr 1e-7 -g_lr 1e-5 -m pix2pix_patch_hue_total -e 1000 -tf tf_logs/pix2pix_patch_hue_total -rl l1 -dr patch -gr skip2
 ```
 
 ## 2. How To generate results on the model
 
-```bash
+```
 usage: evaluate_models.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
                [--n-workers N_WORKERS] [--gpu GPU] [-rs RANDOM_SEED]
                [-dr DISCRIMINATOR] [-gr GENERATOR]  [-d_lr D_LR]  [-g_lr G_LR]

@@ -88,6 +88,67 @@ def calc_vif(img_list1, img_list2):
     return vifp/num_imgs
 
 
+def calc_vif_img(img1, img2):
+    """
+    Calculate VIF for a set of Images
+    :param img_list1: Test Image
+    :param img_list2: Ground Truth Image
+    :return: VIF
+    """
+
+    sigma_nsq = 2
+    eps = 1e-10
+
+    num = 0.0
+    den = 0.0
+    vifp = 0.
+    ref = img1
+    dist = img2
+    for scale in range(1, 5):
+
+        N = 2 ** (4 - scale + 1) + 1
+        sd = N / 5.0
+
+        if scale > 1:
+            ref = scipy.ndimage.gaussian_filter(ref, sd)
+            dist = scipy.ndimage.gaussian_filter(dist, sd)
+            ref = ref[::2, ::2]
+            dist = dist[::2, ::2]
+
+        mu1 = scipy.ndimage.gaussian_filter(ref, sd)
+        mu2 = scipy.ndimage.gaussian_filter(dist, sd)
+        mu1_sq = mu1 * mu1
+        mu2_sq = mu2 * mu2
+        mu1_mu2 = mu1 * mu2
+        sigma1_sq = scipy.ndimage.gaussian_filter(ref * ref, sd) - mu1_sq
+        sigma2_sq = scipy.ndimage.gaussian_filter(dist * dist, sd) - mu2_sq
+        sigma12 = scipy.ndimage.gaussian_filter(ref * dist, sd) - mu1_mu2
+
+        sigma1_sq[sigma1_sq < 0] = 0
+        sigma2_sq[sigma2_sq < 0] = 0
+
+        g = sigma12 / (sigma1_sq + eps)
+        sv_sq = sigma2_sq - g * sigma12
+
+        g[sigma1_sq < eps] = 0
+        sv_sq[sigma1_sq < eps] = sigma2_sq[sigma1_sq < eps]
+        sigma1_sq[sigma1_sq < eps] = 0
+
+        g[sigma2_sq < eps] = 0
+        sv_sq[sigma2_sq < eps] = 0
+
+        sv_sq[g < 0] = sigma2_sq[g < 0]
+        g[g < 0] = 0
+        sv_sq[sv_sq <= eps] = eps
+
+        num += np.sum(np.log10(1 + g * g * sigma1_sq / (sv_sq + sigma_nsq)))
+        den += np.sum(np.log10(1 + sigma1_sq / sigma_nsq))
+
+    vifp += num / den
+
+    return vifp
+
+
 def calc_mse_psnr(img_list1, img_list2):
     """
     Calculate MSE and PSNR for a set of Images
@@ -117,6 +178,26 @@ def calc_mse_psnr(img_list1, img_list2):
         total_psnr += psnr
 
     return  total_mse/num_imgs, total_psnr/num_imgs
+
+
+def calc_mse_psnr_img(img1, img2):
+    """
+    Calculate MSE and PSNR for a set of Images
+    :param img_list1: Image List1
+    :param img_list2: Image List2
+    :return: MSE, PSNR
+    """
+    mse_val = calc_mse(img1,img2)
+    if mse_val == 0.:
+        psnr = 100
+    else:
+        # im1 = tf.image.convert_image_dtype(img_list1[i], tf.float32)
+        # im2 = tf.image.convert_image_dtype(img_list2[i], tf.float32)
+        # psnr = tf.image.psnr(im1, im2, max_val=255)
+        psnr = 20 * math.log10(PIXEL_MAX / math.sqrt(mse_val))
+
+
+    return  mse_val, psnr
 
 
 def d_accuracy(real_prob, fake_prob):

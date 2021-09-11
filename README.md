@@ -1,4 +1,4 @@
-# Deep Image Compositing : Realistic Composite Image Creation Using GANs
+# Deep Image Compositing : Realistic Composite Image Creation Using GANs [Paper](https://dl.acm.org/doi/10.1145/3393822.3432314)
 
 This work has been accepted at 14th WiML Workshop, NeurIPS Conference 2019. Find the attached poster [here](https://www.academia.edu/40947406/Deep_Image_Compositing).
 

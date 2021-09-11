@@ -161,3 +161,18 @@ The `.npy` file for evaluation can be downloaded [here](https://drive.google.com
   <img src="/images/gt_149.png" width="23%" />
 </p>
 <pre> |     Composite       |       Deep Image        |        Predicted(Ours)      |       Ground Truth        | </pre>
+
+
+
+## Citation
+If you find this work useful, please consider citing
+
+```
+@inproceedings{aneja2020deep,
+  title={Deep Image Compositing},
+  author={Aneja, Shivangi and Mazumder, Soham},
+  booktitle={Proceedings of the 2020 European Symposium on Software Engineering},
+  pages={101--104},
+  year={2020}
+}
+```
